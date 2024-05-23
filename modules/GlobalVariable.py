@@ -5,9 +5,13 @@ import sys, os
 
 app = QApplication(sys.argv)
 
-APP_ICON = QPixmap(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\APP_ICON.png').scaled(25,25,transformMode=Qt.TransformationMode.SmoothTransformation)
-CLOSE_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\CLOSE_ICON.png')
-MINIMIZE_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\MINIMIZE_ICON.png')
+APP_ICON = QPixmap(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\app.png').scaled(25,25,transformMode=Qt.TransformationMode.SmoothTransformation)
+CLOSE_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\close.png')
+MINIMIZE_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\minimize.png')
+PLAY_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\play.png')
+PAUSE_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\pause.png')
+PREVIOUS_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\previous.png')
+NEXT_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\next.png')
 
 CSS = '''
     * {
@@ -42,6 +46,28 @@ CSS = '''
     }
     #btn_orange_transp:pressed {
         background-color: rgba(255,88,0,0.6);
+    }
+    #btn_orange {
+        background-color: rgba(255,88,0,0.8);
+        border: 1px solid rgb(0,0,0);
+        border-radius: 15px;
+    }
+    #btn_orange:hover {
+        background-color: rgba(255,88,0,0.6);
+    }
+    #btn_orange:pressed {
+        background-color: rgba(255,88,0,0.4);
+    }
+    #btn_red {
+        background-color: rgba(200,0,0,0.8);
+        border: 1px solid rgb(0,0,0);
+        border-radius: 15px;
+    }
+    #btn_red:hover {
+        background-color: rgba(200,0,0,0.6);
+    }
+    #btn_red:hover {
+        background-color: rgba(200,0,0,0.4);
     }
 
     QHeaderView {
