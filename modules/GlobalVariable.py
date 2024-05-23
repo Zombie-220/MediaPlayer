@@ -21,9 +21,12 @@ CSS = '''
     #TitleBar {
         background-color: rgb(21,21,21);
     }
-    #MainWindow {
+    #MainWindow, QToolTip {
         background-color: rgb(40,40,40);
         border: 1px solid rgb(21,21,21);
+    }
+    QToolTip {
+        font-size: 12px;
     }
 
 
@@ -70,6 +73,7 @@ CSS = '''
         background-color: rgba(200,0,0,0.4);
     }
 
+    
     QHeaderView {
         background-color: rgba(0,0,0,0);
     }
@@ -82,6 +86,7 @@ CSS = '''
     #tablePlaylist {
         background-color: rgba(0,0,0,0);
         border: none;
+        border-bottom: 1px solid rgb(21,21,21);
     }
     QScrollBar:vertical {
         background-color: rgba(0,0,0,0);
@@ -98,5 +103,21 @@ CSS = '''
         background: rgba(21,21,21,0.5);
         color: rgb(240,240,240);
         border: none;
+    }
+
+
+    #entry {
+        background-color: rgb(21,21,21);
+        border: none;
+        border-radius: 15px;
+    }
+    QSlider:groove {
+        border: 1px solid rgb(21,21,21);
+        border-radius: 5px;
+    }
+    QSlider:handle {
+        background-color: rgb(255,88,0);
+        border-radius: 3px;
+        width: 6px;
     }
 '''

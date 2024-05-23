@@ -8,12 +8,10 @@ class Button(QtWidgets.QPushButton):
         
         self.setGeometry(x, y, width, height)
         self.setObjectName(objectName)
-
         if type(content) == str:
             self.setText(content)
         elif type(content) == QtGui.QIcon:
             self.setIcon(content)
-
         if func != None:
             self.clicked.connect(func)
 
@@ -28,7 +26,6 @@ class Label(QtWidgets.QLabel):
         self.setGeometry(x, y, width, height)
         self.setObjectName(objectName)
         self.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-
         if type(content) == str:
             self.setText(content)
         elif type(content) == QtGui.QPixmap:
@@ -46,7 +43,6 @@ class LineEntry(QtWidgets.QLineEdit):
         self.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.setObjectName(objectName)
         self.setPlaceholderText(placeholder)
-
         if readOnly:
             self.setReadOnly(True)
         else:
@@ -70,12 +66,10 @@ class WindowTitleBar(QtWidgets.QLabel):
         super().__init__(parent)
         
         self.icon = parent.icon
-
         self.parent = parent
         self.resize(parent.width(), 30)
         self.move(0,0)
         self.setObjectName("TitleBar")
-
         labelLogo = QtWidgets.QLabel(self)
         labelLogo.setPixmap(self.icon)
         labelLogo.setFixedSize(30,30)
