@@ -69,6 +69,7 @@ class PlaylistTable(QTableWidget):
                     self.setItem(self.rowCount()-1, 2, QTableWidgetItem(duration))
                     count += 1
                     dist[count] = f"{path}\\{file}"
+            break
         self.playlist = dist
         time.sleep(0.05)
         if self.verticalScrollBar().isVisible():
