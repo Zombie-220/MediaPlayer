@@ -7,6 +7,7 @@ import time
 
 class MainWindow(QMainWindow):
     def changeMedia(self, musicID: int) -> None: ...
+    def play(self) -> None: ...
 
 class PlaylistTable(QTableWidget):
     def __init__(self, parent: MainWindow,
@@ -85,4 +86,5 @@ class PlaylistTable(QTableWidget):
             item = self.itemAt(event.pos())
             if item:
                 self.myParent.changeMedia(self.itemAt(event.pos()).row()+1)
+                self.myParent.play()
         return super(PlaylistTable, self).eventFilter(source, event)

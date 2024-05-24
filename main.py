@@ -15,6 +15,7 @@ class MainWindow(QMainWindow):
         self.icon: QPixmap = APP_ICON
         self.title: str = title
         self.nowPlaying: int = 1
+        self.playbackState: bool = False
 
         self.setWindowIcon(QIcon(self.icon))
         self.setWindowTitle(self.title)
@@ -66,27 +67,26 @@ class MainWindow(QMainWindow):
     def changePlaybackState(self) -> None:
         match self.__mediaPlayer.playbackState():
             case QMediaPlayer.PlaybackState.PlayingState:
-                self.__mediaPlayer.pause()
-                self.__btnPlay.setIcon(PLAY_ICON)
-                self.__btnPlay.setToolTip("Проиграть")
+                self.pause()
             case QMediaPlayer.PlaybackState.StoppedState:
-                self.changeMedia(1)
-                self.__btnPlay.setIcon(PAUSE_ICON)
-                self.__btnPlay.setToolTip("Остановить")
+                self.changeMedia(self.nowPlaying)
+                self.play()
             case QMediaPlayer.PlaybackState.PausedState:
-                self.__mediaPlayer.play()
-                self.__btnPlay.setIcon(PAUSE_ICON)
-                self.__btnPlay.setToolTip("Остановить")
+                self.play()
 
     def previousTrack(self) -> None:
         if self.__mediaPlayer.position() < 5000:
             if self.nowPlaying <= 1: self.changeMedia(len(self.playlist.playlist))
-            else: self.changeMedia(self.nowPlaying-1)
+            else:
+                self.changeMedia(self.nowPlaying-1)
+                if self.playbackState: self.play()
         else: self.__mediaPlayer.setPosition(0)
 
     def nextTrack(self) -> None:
         if self.nowPlaying >= len(self.playlist.playlist): self.changeMedia(1)
-        else: self.changeMedia(self.nowPlaying+1)
+        else:
+            self.changeMedia(self.nowPlaying+1)
+            if self.playbackState: self.play()
 
     def changeTimecode(self, d: int) -> None:
         m = d // 1000 // 60
@@ -101,7 +101,7 @@ class MainWindow(QMainWindow):
     def sliderReleased(self) -> None:
         self.__mediaPlayer.stop()
         self.__mediaPlayer.setPosition(self.__sliderDuration.value())
-        self.__mediaPlayer.play()
+        if self.playbackState: self.play()
 
     def changeMedia(self, musicID: int) -> None:
         newMedia = QUrl.fromLocalFile(Rf"{self.playlist.playlist[musicID]}")
@@ -115,9 +115,24 @@ class MainWindow(QMainWindow):
         for i in range(self.playlist.columnCount()):
             try: self.playlist.item(self.nowPlaying-1, i).setBackground(QColor(255,88,0,240))
             except: pass
+
+    def play(self) -> None:
         self.__mediaPlayer.play()
-        self.__btnPlay.setToolTip("Остановить")
+        self.playbackState = True
         self.__btnPlay.setIcon(PAUSE_ICON)
+        self.__btnPlay.setToolTip("Остановить")
+
+    def pause(self) -> None:
+        self.__mediaPlayer.pause()
+        self.playbackState = False
+        self.__btnPlay.setIcon(PLAY_ICON)
+        self.__btnPlay.setToolTip("Проиграть")
+
+    def stop(self) -> None:
+        self.__mediaPlayer.stop()
+        self.playbackState = False
+        self.__btnPlay.setIcon(PLAY_ICON)
+        self.__btnPlay.setToolTip("Проиграть")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
