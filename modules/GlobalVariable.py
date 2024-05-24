@@ -12,6 +12,10 @@ PLAY_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\play
 PAUSE_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\pause.png')
 PREVIOUS_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\previous.png')
 NEXT_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\next.png')
+REDUCE_VOLUME_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\reduceVolume.png')
+ADD_VOLUME_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\addVolume.png')
+MUTE_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\mute.png')
+REPEAT_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\repeat.png')
 
 CSS = '''
     * {
@@ -50,15 +54,15 @@ CSS = '''
     #btn_orange_transp:pressed {
         background-color: rgba(255,88,0,0.6);
     }
-    #btn_orange {
+    #btn_orange, #btn_mute {
         background-color: rgba(255,88,0,0.8);
         border: 1px solid rgb(0,0,0);
         border-radius: 15px;
     }
-    #btn_orange:hover {
+    #btn_orange:hover, #btn_mute:hover {
         background-color: rgba(255,88,0,0.6);
     }
-    #btn_orange:pressed {
+    #btn_orange:pressed, #btn_mute:pressed {
         background-color: rgba(255,88,0,0.4);
     }
     #btn_red {
@@ -69,7 +73,7 @@ CSS = '''
     #btn_red:hover {
         background-color: rgba(200,0,0,0.6);
     }
-    #btn_red:hover {
+    #btn_red:pressed {
         background-color: rgba(200,0,0,0.4);
     }
 

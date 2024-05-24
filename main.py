@@ -51,14 +51,34 @@ class MainWindow(QMainWindow):
         self.__mediaPlayer.positionChanged.connect(self.changeTimecode)
         self.__mediaPlayer.mediaStatusChanged.connect(self.mediaStatusChanged)
 
+        btnReduceVolume = Button(self, REDUCE_VOLUME_ICON, self.__btnPlay.pos().x()+self.__btnPlay.width()+10, self.__btnPlay.pos().y(), 30, 30, "btn_orange", self.reduceVolume)
+        btnReduceVolume.setToolTip("Уменьшить громкость")
+        btnReduceVolume.setShortcut(Qt.Key.Key_Down)
+        btnReduceVolume.setIconSize(QSize(20,20))
+        self.__entryVolume = LineEntry(self, btnReduceVolume.pos().x()+btnReduceVolume.width()+5, btnReduceVolume.pos().y(), 70, 30, "", True, "entry")
+        btnAddVolume = Button(self, ADD_VOLUME_ICON, self.__entryVolume.pos().x()+self.__entryVolume.width()+5, self.__entryVolume.pos().y(), 30, 30, "btn_orange", self.addVolume)
+        btnAddVolume.setToolTip("Увеличить громкость")
+        btnAddVolume.setShortcut(Qt.Key.Key_Up)
+        btnAddVolume.setIconSize(QSize(20,20))
+        self.__btnMute = Button(self, MUTE_ICON, btnAddVolume.pos().x(), btnAddVolume.pos().y()+btnAddVolume.height()+5, 30, 30, "btn_mute", self.mute)
+        self.__btnMute.setToolTip("Выключить звук")
+        self.__btnMute.setShortcut(Qt.Key.Key_M)
+        self.__btnMute.setIconSize(QSize(20,20))
+        self.__sliderVolume = QSlider(Qt.Orientation.Horizontal, self)
+        self.__sliderVolume.setRange(0, 100)
+        self.__sliderVolume.setFixedSize((btnAddVolume.pos().x()+btnAddVolume.width())-(self.__entryVolume.pos().x()), 15)
+        self.__sliderVolume.move(btnReduceVolume.pos().x(), btnReduceVolume.pos().y()+btnReduceVolume.height()+14)
+        self.__sliderVolume.valueChanged.connect(self.volumeChanged)
+        self.__sliderVolume.setValue(20)
+
         self.__sliderDuration = QSlider(Qt.Orientation.Horizontal, self)
-        self.__sliderDuration.move(btnNext.pos().x() + btnNext.width() + 10, btnNext.pos().y() + 8)
+        self.__sliderDuration.move(btnNext.pos().x() + btnNext.width() + 10, btnNext.pos().y() + 10)
         self.__sliderDuration.setFixedSize(self.width() - (btnNext.pos().x() + btnNext.width() + 10) - 110, 15)
         self.__sliderDuration.sliderPressed.connect(self.__mediaPlayer.stop)
         self.__sliderDuration.sliderReleased.connect(self.sliderReleased)
         self.__sliderDuration.valueChanged.connect(self.changeTimecode)
         
-        self.__entryDuration = LineEntry(self, self.__sliderDuration.pos().x()+self.__sliderDuration.width()+10, btnNext.pos().y(), 90, 30, "0:00", True, "entry")
+        self.__entryDuration = LineEntry(self, self.__sliderDuration.pos().x()+self.__sliderDuration.width()+10, btnNext.pos().y(), 90, 30, "", True, "entry")
         self.__entryDuration.setText("0:00")
 
     def closeEvent(self, event) -> None:
@@ -133,6 +153,27 @@ class MainWindow(QMainWindow):
         self.playbackState = False
         self.__btnPlay.setIcon(PLAY_ICON)
         self.__btnPlay.setToolTip("Проиграть")
+
+    def reduceVolume(self) -> None:
+        self.__sliderVolume.setValue(self.__sliderVolume.value()-1)
+
+    def addVolume(self) -> None:
+        self.__sliderVolume.setValue(self.__sliderVolume.value()+1)
+
+    def volumeChanged(self, v: int) -> None:
+        self.__entryVolume.setText(f"{v}")
+        self.__mediaPlayer.audioOutput().setVolume(v / 100)
+
+    def mute(self) -> None:
+        muteState = self.__mediaPlayer.audioOutput().isMuted()
+        if muteState:
+            self.__mediaPlayer.audioOutput().setMuted(False)
+            self.__btnMute.setToolTip("Выключить звук")
+            self.__btnMute.setStyleSheet("#btn_mute {background-color: rgba(255,88,0,0.8);}")
+        else:
+            self.__mediaPlayer.audioOutput().setMuted(True)
+            self.__btnMute.setToolTip("Включить звук")
+            self.__btnMute.setStyleSheet("#btn_mute {background-color: rgba(200,0,0,0.8);}")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
