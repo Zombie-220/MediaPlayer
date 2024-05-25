@@ -62,19 +62,18 @@ class TextEdit(QtWidgets.QPlainTextEdit):
 
 
 class WindowTitleBar(QtWidgets.QLabel):
-    def __init__(self, parent: QtWidgets.QMainWindow):
+    def __init__(self, parent: QtWidgets.QMainWindow, icon: QtGui.QPixmap, title: str, objectName: str):
         super().__init__(parent)
-        
-        self.icon = parent.icon
+
         self.parent = parent
         self.resize(parent.width(), 30)
         self.move(0,0)
-        self.setObjectName("TitleBar")
+        self.setObjectName(objectName)
         labelLogo = QtWidgets.QLabel(self)
-        labelLogo.setPixmap(self.icon)
+        labelLogo.setPixmap(icon)
         labelLogo.setFixedSize(30,30)
         labelLogo.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        labelName = QtWidgets.QLabel(parent.title, self)
+        labelName = QtWidgets.QLabel(title, self)
         labelName.setGeometry(35, 0, parent.width(), 30)
         labelName.setObjectName("label")
 

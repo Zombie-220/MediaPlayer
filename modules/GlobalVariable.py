@@ -16,6 +16,7 @@ REDUCE_VOLUME_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\im
 ADD_VOLUME_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\addVolume.png')
 MUTE_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\mute.png')
 REPEAT_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\repeat.png')
+RANDOM_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\random.png')
 
 CSS = '''
     * {
@@ -123,5 +124,35 @@ CSS = '''
         background-color: rgb(255,88,0);
         border-radius: 3px;
         width: 6px;
+    }
+
+
+    #test {
+        border: 2px solid red;
+    }
+'''
+
+SPECIAL_BTN_CSS = '''
+    #btn_orange {
+        background-color: rgba(255,88,0,0.8);
+        border: 1px solid rgb(0,0,0);
+        border-radius: 15px;
+    }
+    #btn_orange:hover {
+        background-color: rgba(255,88,0,0.6);
+    }
+    #btn_orange:pressed {
+        background-color: rgba(255,88,0,0.4);
+    }
+    #btn_red {
+        background-color: rgba(200,0,0,0.8);
+        border: 1px solid rgb(0,0,0);
+        border-radius: 15px;
+    }
+    #btn_red:hover {
+        background-color: rgba(200,0,0,0.6);
+    }
+    #btn_red:pressed {
+        background-color: rgba(200,0,0,0.4);
     }
 '''

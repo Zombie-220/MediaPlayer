@@ -2,10 +2,10 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QSlider, QFileDialog
 from PyQt6.QtCore import Qt, QUrl, QSize
 from PyQt6.QtGui import QIcon, QColor
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
-import sys, time
+import sys, time, eyed3
 
 from modules.GlobalVariable import *
-from modules.SimpleModules import WindowTitleBar, Button, LineEntry
+from modules.SimpleModules import WindowTitleBar, Button, LineEntry, Label
 
 from modules.PlaylistTable import PlaylistTable
 
@@ -16,6 +16,7 @@ class MainWindow(QMainWindow):
         self.title: str = title
         self.nowPlaying: int = 1
         self.playbackState: bool = False
+        self.__randomEnabled: bool = False
 
         self.setWindowIcon(QIcon(self.icon))
         self.setWindowTitle(self.title)
@@ -24,7 +25,7 @@ class MainWindow(QMainWindow):
         self.setFixedSize(720, 560)
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
 
-        windowHat = WindowTitleBar(self)
+        windowHat = WindowTitleBar(self, self.icon, self.title, "TitleBar")
         btn_close = Button(self, CLOSE_ICON, self.width()-30, 0, 30, 30, "btn_red_transp", self.closeEvent)
         btn_close.setToolTip("Закрыть окно")
         btn_showMinimize = Button(self, MINIMIZE_ICON, self.width()-60, 0, 30, 30, "btn_orange_transp", self.showMinimized)
@@ -64,6 +65,7 @@ class MainWindow(QMainWindow):
         self.__btnMute.setToolTip("Выключить звук")
         self.__btnMute.setShortcut(Qt.Key.Key_M)
         self.__btnMute.setIconSize(QSize(20,20))
+        self.__btnMute.setStyleSheet(SPECIAL_BTN_CSS)
         self.__sliderVolume = QSlider(Qt.Orientation.Horizontal, self)
         self.__sliderVolume.setRange(0, 100)
         self.__sliderVolume.setFixedSize((btnAddVolume.pos().x()+btnAddVolume.width())-(self.__entryVolume.pos().x()), 15)
@@ -77,9 +79,23 @@ class MainWindow(QMainWindow):
         self.__sliderDuration.sliderPressed.connect(self.__mediaPlayer.stop)
         self.__sliderDuration.sliderReleased.connect(self.sliderReleased)
         self.__sliderDuration.valueChanged.connect(self.changeTimecode)
-        
+
         self.__entryDuration = LineEntry(self, self.__sliderDuration.pos().x()+self.__sliderDuration.width()+10, btnNext.pos().y(), 90, 30, "", True, "entry")
         self.__entryDuration.setText("0:00")
+
+        self.__btnRandom = Button(self, RANDOM_ICON, btnAddVolume.pos().x()+btnAddVolume.width()+10, btnAddVolume.pos().y(), 30, 30, "btn_orange", self.changeRandom)
+        self.__btnRandom.setIconSize(QSize(20,20))
+        self.__btnRandom.setToolTip("Воспроизводить в случайном пордке")
+        self.__btnRandom.setStyleSheet(SPECIAL_BTN_CSS)
+        self.__btnRepeat = Button(self, REPEAT_ICON, self.__btnRandom.pos().x(), self.__btnMute.pos().y(), 30, 30, "btn_orange", self.enableRepeat)
+        self.__btnRepeat.setIconSize(QSize(20,20))
+        self.__btnRepeat.setToolTip("Включить повтор")
+        self.__btnRepeat.setStyleSheet(SPECIAL_BTN_CSS)
+
+        self.__labelNames = Label(self, self.__btnRandom.pos().x()+self.__btnRandom.width()+10, self.__btnRandom.pos().y(),
+                                      (self.__entryDuration.pos().x()+self.__entryDuration.width())-(self.__btnRandom.pos().x()+self.__btnRandom.width()+10), 45,
+                                      "label", "Исполнитель: >_<\nНазвание: >_<")
+        self.__labelNames.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
     def closeEvent(self, event) -> None:
         self.close()
@@ -111,12 +127,13 @@ class MainWindow(QMainWindow):
     def changeTimecode(self, d: int) -> None:
         m = d // 1000 // 60
         s = d // 1000 % 60
-        self.__entryDuration.setText(f'{m:>1}:{s:0>2}') 
+        self.__entryDuration.setText(f'{m:>1}:{s:0>2}')
         self.__sliderDuration.setValue(d)
 
     def mediaStatusChanged(self, status: QMediaPlayer.MediaStatus) -> None:
         if status == QMediaPlayer.MediaStatus.EndOfMedia:
-            self.nextTrack()
+            if self.__mediaPlayer.loops() != -1: self.nextTrack()
+            else: self.__sliderDuration.setValue(0)
 
     def sliderReleased(self) -> None:
         self.__mediaPlayer.stop()
@@ -135,6 +152,12 @@ class MainWindow(QMainWindow):
         for i in range(self.playlist.columnCount()):
             try: self.playlist.item(self.nowPlaying-1, i).setBackground(QColor(255,88,0,240))
             except: pass
+        mp3 = eyed3.load(Rf"{self.playlist.playlist[musicID]}")
+        if mp3.tag.artist == None: artist = ">_<"
+        else: artist = mp3.tag.artist
+        if mp3.tag.title == None: title = ">_<"
+        else: title = mp3.tag.title
+        self.__labelNames.setText(f"Исполнитель: {artist}\nНазвание: {title}")
 
     def play(self) -> None:
         self.__mediaPlayer.play()
@@ -169,11 +192,27 @@ class MainWindow(QMainWindow):
         if muteState:
             self.__mediaPlayer.audioOutput().setMuted(False)
             self.__btnMute.setToolTip("Выключить звук")
-            self.__btnMute.setStyleSheet("#btn_mute {background-color: rgba(255,88,0,0.8);}")
+            self.__btnMute.setObjectName("btn_orange")
         else:
             self.__mediaPlayer.audioOutput().setMuted(True)
             self.__btnMute.setToolTip("Включить звук")
-            self.__btnMute.setStyleSheet("#btn_mute {background-color: rgba(200,0,0,0.8);}")
+            self.__btnMute.setObjectName("btn_red")
+        self.__btnMute.setStyleSheet(SPECIAL_BTN_CSS)
+
+    def enableRepeat(self) -> None:
+        if self.__mediaPlayer.loops() != -1:
+            self.__mediaPlayer.setLoops(-1)
+            self.__btnRepeat.setObjectName("btn_red")
+        else:
+            self.__mediaPlayer.setLoops(1)
+            self.__btnRepeat.setObjectName("btn_orange")
+        self.__btnRepeat.setStyleSheet(SPECIAL_BTN_CSS)
+
+    def changeRandom(self) -> None:
+        self.__randomEnabled = not (self.__randomEnabled)
+        if self.__randomEnabled: self.__btnRandom.setObjectName("btn_red")
+        else: self.__btnRandom.setObjectName("btn_orange")
+        self.__btnRandom.setStyleSheet(SPECIAL_BTN_CSS)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
@@ -181,3 +220,5 @@ if __name__ == '__main__':
     window.show()
     window.playlist.loadPlaylistThread.start()    
     sys.exit(app.exec())
+
+# повтор, там таймлайн не переводится на начало, после окончания трека
