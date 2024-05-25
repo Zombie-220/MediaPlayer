@@ -1,12 +1,11 @@
-from PyQt6.QtWidgets import QApplication, QMainWindow, QSlider, QFileDialog
+from PyQt6.QtWidgets import QApplication, QMainWindow, QSlider
 from PyQt6.QtCore import Qt, QUrl, QSize
 from PyQt6.QtGui import QIcon, QColor
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
-import sys, time, eyed3
+import sys, time, eyed3, random
 
 from modules.GlobalVariable import *
 from modules.SimpleModules import WindowTitleBar, Button, LineEntry, Label
-
 from modules.PlaylistTable import PlaylistTable
 from modules.WarningWindow import WarningWindow
 
@@ -19,6 +18,7 @@ class MainWindow(QMainWindow):
         self.playbackState: bool = False
         self.__repeatTrack: bool = False
         self.__randomEnabled: bool = False
+        self.__listOfTracks: list[int] = []
 
         self.setWindowIcon(QIcon(self.icon))
         self.setWindowTitle(self.title)
@@ -63,7 +63,7 @@ class MainWindow(QMainWindow):
         btnAddVolume.setToolTip("Увеличить громкость")
         btnAddVolume.setShortcut(Qt.Key.Key_Up)
         btnAddVolume.setIconSize(QSize(20,20))
-        self.__btnMute = Button(self, MUTE_ICON, btnAddVolume.pos().x(), btnAddVolume.pos().y()+btnAddVolume.height()+5, 30, 30, "btn_mute", self.mute)
+        self.__btnMute = Button(self, MUTE_ICON, btnAddVolume.pos().x(), btnAddVolume.pos().y()+btnAddVolume.height()+5, 30, 30, "btn_orange", self.mute)
         self.__btnMute.setToolTip("Выключить звук")
         self.__btnMute.setShortcut(Qt.Key.Key_M)
         self.__btnMute.setIconSize(QSize(20,20))
@@ -85,7 +85,7 @@ class MainWindow(QMainWindow):
         self.__entryDuration = LineEntry(self, self.__sliderDuration.pos().x()+self.__sliderDuration.width()+10, btnNext.pos().y(), 90, 30, "", True, "entry")
         self.__entryDuration.setText("0:00")
 
-        self.__btnRandom = Button(self, RANDOM_ICON, btnAddVolume.pos().x()+btnAddVolume.width()+10, btnAddVolume.pos().y(), 30, 30, "btn_orange", self.changeRandom)
+        self.__btnRandom = Button(self, RANDOM_ICON, btnAddVolume.pos().x()+btnAddVolume.width()+10, btnAddVolume.pos().y(), 30, 30, "btn_orange", self.enableRandom)
         self.__btnRandom.setIconSize(QSize(20,20))
         self.__btnRandom.setToolTip("Воспроизводить в случайном пордке")
         self.__btnRandom.setStyleSheet(SPECIAL_BTN_CSS)
@@ -113,18 +113,32 @@ class MainWindow(QMainWindow):
                 self.play()
 
     def previousTrack(self) -> None:
-        if self.__mediaPlayer.position() < 5000:
-            if self.nowPlaying <= 1: self.changeMedia(len(self.playlist.playlist))
+        if self.__mediaPlayer.position() > 5000: self.__mediaPlayer.setPosition(0)
+        else:
+            if self.__randomEnabled:
+                if len(self.__listOfTracks) >= 1: self.__listOfTracks.pop()
+                if len(self.__listOfTracks) <= 0:
+                    nextTrack = random.randint(1, len(self.playlist.playlist))
+                    while nextTrack == self.nowPlaying: nextTrack = random.randint(1, len(self.playlist.playlist))
+                else: nextTrack = self.__listOfTracks[-1]
             else:
-                self.changeMedia(self.nowPlaying-1)
-                if self.playbackState: self.play()
-        else: self.__mediaPlayer.setPosition(0)
+                if self.nowPlaying <= 1: nextTrack = len(self.playlist.playlist)
+                else: nextTrack = self.nowPlaying - 1
+        print(self.__listOfTracks)
+        self.changeMedia(nextTrack)
+        if self.playbackState: self.play()
 
     def nextTrack(self) -> None:
-        if self.nowPlaying >= len(self.playlist.playlist): self.changeMedia(1)
+        if self.__randomEnabled:
+            if len(self.__listOfTracks) == len(self.playlist.playlist): self.__listOfTracks = []
+            nextTrack = random.randint(1, len(self.playlist.playlist))
+            while nextTrack in self.__listOfTracks: nextTrack = random.randint(1, len(self.playlist.playlist))
+            self.__listOfTracks.append(nextTrack)
         else:
-            self.changeMedia(self.nowPlaying+1)
-            if self.playbackState: self.play()
+            if self.nowPlaying >= len(self.playlist.playlist): nextTrack = 1
+            else: nextTrack = self.nowPlaying + 1
+        self.changeMedia(nextTrack)
+        if self.playbackState: self.play()
 
     def changeTimecode(self, d: int) -> None:
         m = d // 1000 // 60
@@ -206,13 +220,11 @@ class MainWindow(QMainWindow):
 
     def enableRepeat(self) -> None:
         self.__repeatTrack = not (self.__repeatTrack)
-        if self.__repeatTrack:
-            self.__btnRepeat.setObjectName("btn_red")
-        else:
-            self.__btnRepeat.setObjectName("btn_orange")
+        if self.__repeatTrack: self.__btnRepeat.setObjectName("btn_red")
+        else: self.__btnRepeat.setObjectName("btn_orange")
         self.__btnRepeat.setStyleSheet(SPECIAL_BTN_CSS)
 
-    def changeRandom(self) -> None:
+    def enableRandom(self) -> None:
         self.__randomEnabled = not (self.__randomEnabled)
         if self.__randomEnabled: self.__btnRandom.setObjectName("btn_red")
         else: self.__btnRandom.setObjectName("btn_orange")

@@ -56,27 +56,16 @@ CSS = '''
     #btn_orange_transp:pressed {
         background-color: rgba(255,88,0,0.6);
     }
-    #btn_orange, #btn_mute {
+    #btn_orange {
         background-color: rgba(255,88,0,0.8);
         border: 1px solid rgb(0,0,0);
         border-radius: 15px;
     }
-    #btn_orange:hover, #btn_mute:hover {
+    #btn_orange:hover {
         background-color: rgba(255,88,0,0.6);
     }
-    #btn_orange:pressed, #btn_mute:pressed {
+    #btn_orange:pressed {
         background-color: rgba(255,88,0,0.4);
-    }
-    #btn_red {
-        background-color: rgba(200,0,0,0.8);
-        border: 1px solid rgb(0,0,0);
-        border-radius: 15px;
-    }
-    #btn_red:hover {
-        background-color: rgba(200,0,0,0.6);
-    }
-    #btn_red:pressed {
-        background-color: rgba(200,0,0,0.4);
     }
 
     
@@ -128,17 +117,12 @@ CSS = '''
     }
 
 
-    #warningWindow {
+    #WarningWindow {
         background-color: rgb(21,21,21);
         border: 1px solid rgb(255,88,0);
     }
-    #warningWindowTitle {
+    #WarningWindowTitle {
         background-color: rgb(255,88,0);
-    }
-
-
-    #test {
-        border: 2px solid red;
     }
 '''
 
