@@ -8,6 +8,7 @@ from modules.GlobalVariable import *
 from modules.SimpleModules import WindowTitleBar, Button, LineEntry, Label
 
 from modules.PlaylistTable import PlaylistTable
+from modules.WarningWindow import WarningWindow
 
 class MainWindow(QMainWindow):
     def __init__(self, title: str):
@@ -16,6 +17,7 @@ class MainWindow(QMainWindow):
         self.title: str = title
         self.nowPlaying: int = 1
         self.playbackState: bool = False
+        self.__repeatTrack: bool = False
         self.__randomEnabled: bool = False
 
         self.setWindowIcon(QIcon(self.icon))
@@ -132,8 +134,11 @@ class MainWindow(QMainWindow):
 
     def mediaStatusChanged(self, status: QMediaPlayer.MediaStatus) -> None:
         if status == QMediaPlayer.MediaStatus.EndOfMedia:
-            if self.__mediaPlayer.loops() != -1: self.nextTrack()
-            else: self.__sliderDuration.setValue(0)
+            if self.__repeatTrack:
+                self.__mediaPlayer.setSource(QUrl())
+                self.changeMedia(self.nowPlaying)
+                self.play()
+            else: self.nextTrack()
 
     def sliderReleased(self) -> None:
         self.__mediaPlayer.stop()
@@ -200,11 +205,10 @@ class MainWindow(QMainWindow):
         self.__btnMute.setStyleSheet(SPECIAL_BTN_CSS)
 
     def enableRepeat(self) -> None:
-        if self.__mediaPlayer.loops() != -1:
-            self.__mediaPlayer.setLoops(-1)
+        self.__repeatTrack = not (self.__repeatTrack)
+        if self.__repeatTrack:
             self.__btnRepeat.setObjectName("btn_red")
         else:
-            self.__mediaPlayer.setLoops(1)
             self.__btnRepeat.setObjectName("btn_orange")
         self.__btnRepeat.setStyleSheet(SPECIAL_BTN_CSS)
 
@@ -217,8 +221,9 @@ class MainWindow(QMainWindow):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow("Media player")
+    warningWindow = WarningWindow()
     window.show()
-    window.playlist.loadPlaylistThread.start()    
+    window.playlist.loadPlaylistThread.start()
     sys.exit(app.exec())
 
 # повтор, там таймлайн не переводится на начало, после окончания трека
