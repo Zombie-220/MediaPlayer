@@ -14,8 +14,8 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.icon: QPixmap = APP_ICON
         self.title: str = title
-        self.nowPlaying: int = 1
-        self.playbackState: bool = False
+        self.__nowPlaying: int = 1
+        self.__playbackState: bool = False
         self.__repeatTrack: bool = False
         self.__randomEnabled: bool = False
         self.__listOfTracks: list[int] = []
@@ -107,7 +107,7 @@ class MainWindow(QMainWindow):
             case QMediaPlayer.PlaybackState.PlayingState:
                 self.pause()
             case QMediaPlayer.PlaybackState.StoppedState:
-                self.changeMedia(self.nowPlaying)
+                self.changeMedia(self.__nowPlaying)
                 self.play()
             case QMediaPlayer.PlaybackState.PausedState:
                 self.play()
@@ -119,14 +119,13 @@ class MainWindow(QMainWindow):
                 if len(self.__listOfTracks) >= 1: self.__listOfTracks.pop()
                 if len(self.__listOfTracks) <= 0:
                     nextTrack = random.randint(1, len(self.playlist.playlist))
-                    while nextTrack == self.nowPlaying: nextTrack = random.randint(1, len(self.playlist.playlist))
+                    while nextTrack == self.__nowPlaying: nextTrack = random.randint(1, len(self.playlist.playlist))
                 else: nextTrack = self.__listOfTracks[-1]
             else:
-                if self.nowPlaying <= 1: nextTrack = len(self.playlist.playlist)
-                else: nextTrack = self.nowPlaying - 1
-        print(self.__listOfTracks)
+                if self.__nowPlaying <= 1: nextTrack = len(self.playlist.playlist)
+                else: nextTrack = self.__nowPlaying - 1
         self.changeMedia(nextTrack)
-        if self.playbackState: self.play()
+        if self.__playbackState: self.play()
 
     def nextTrack(self) -> None:
         if self.__randomEnabled:
@@ -135,10 +134,10 @@ class MainWindow(QMainWindow):
             while nextTrack in self.__listOfTracks: nextTrack = random.randint(1, len(self.playlist.playlist))
             self.__listOfTracks.append(nextTrack)
         else:
-            if self.nowPlaying >= len(self.playlist.playlist): nextTrack = 1
-            else: nextTrack = self.nowPlaying + 1
+            if self.__nowPlaying >= len(self.playlist.playlist): nextTrack = 1
+            else: nextTrack = self.__nowPlaying + 1
         self.changeMedia(nextTrack)
-        if self.playbackState: self.play()
+        if self.__playbackState: self.play()
 
     def changeTimecode(self, d: int) -> None:
         m = d // 1000 // 60
@@ -150,14 +149,14 @@ class MainWindow(QMainWindow):
         if status == QMediaPlayer.MediaStatus.EndOfMedia:
             if self.__repeatTrack:
                 self.__mediaPlayer.setSource(QUrl())
-                self.changeMedia(self.nowPlaying)
+                self.changeMedia(self.__nowPlaying)
                 self.play()
             else: self.nextTrack()
 
     def sliderReleased(self) -> None:
         self.__mediaPlayer.stop()
         self.__mediaPlayer.setPosition(self.__sliderDuration.value())
-        if self.playbackState: self.play()
+        if self.__playbackState: self.play()
 
     def changeMedia(self, musicID: int) -> None:
         newMedia = QUrl.fromLocalFile(Rf"{self.playlist.playlist[musicID]}")
@@ -165,11 +164,11 @@ class MainWindow(QMainWindow):
         time.sleep(0.5)
         self.__mediaPlayer.setSource(newMedia)
         for i in range(self.playlist.columnCount()):
-            try: self.playlist.item(self.nowPlaying-1, i).setBackground(QColor(0,0,0,0))
+            try: self.playlist.item(self.__nowPlaying-1, i).setBackground(QColor(0,0,0,0))
             except: pass
-        self.nowPlaying = musicID
+        self.__nowPlaying = musicID
         for i in range(self.playlist.columnCount()):
-            try: self.playlist.item(self.nowPlaying-1, i).setBackground(QColor(255,88,0,240))
+            try: self.playlist.item(self.__nowPlaying-1, i).setBackground(QColor(255,88,0,240))
             except: pass
         mp3 = eyed3.load(Rf"{self.playlist.playlist[musicID]}")
         if mp3.tag.artist == None: artist = ">_<"
@@ -180,19 +179,19 @@ class MainWindow(QMainWindow):
 
     def play(self) -> None:
         self.__mediaPlayer.play()
-        self.playbackState = True
+        self.__playbackState = True
         self.__btnPlay.setIcon(PAUSE_ICON)
         self.__btnPlay.setToolTip("Остановить")
 
     def pause(self) -> None:
         self.__mediaPlayer.pause()
-        self.playbackState = False
+        self.__playbackState = False
         self.__btnPlay.setIcon(PLAY_ICON)
         self.__btnPlay.setToolTip("Проиграть")
 
     def stop(self) -> None:
         self.__mediaPlayer.stop()
-        self.playbackState = False
+        self.__playbackState = False
         self.__btnPlay.setIcon(PLAY_ICON)
         self.__btnPlay.setToolTip("Проиграть")
 
