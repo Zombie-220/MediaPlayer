@@ -17,6 +17,7 @@ ADD_VOLUME_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\image
 MUTE_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\mute.png')
 REPEAT_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\repeat.png')
 RANDOM_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\random.png')
+WARNING_ICON = QPixmap(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\warning.png').scaled(25,25,transformMode=Qt.TransformationMode.SmoothTransformation)
 
 CSS = '''
     * {
@@ -124,6 +125,15 @@ CSS = '''
         background-color: rgb(255,88,0);
         border-radius: 3px;
         width: 6px;
+    }
+
+
+    #warningWindow {
+        background-color: rgb(21,21,21);
+        border: 1px solid rgb(255,88,0);
+    }
+    #warningWindowTitle {
+        background-color: rgb(255,88,0);
     }
 
 
