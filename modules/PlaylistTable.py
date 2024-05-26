@@ -1,9 +1,7 @@
-from PyQt6.QtWidgets import QMainWindow, QTableWidget, QAbstractItemView, QTableWidgetItem, QWidget, QMenu, QHeaderView
+from PyQt6.QtWidgets import QMainWindow, QTableWidget, QAbstractItemView, QTableWidgetItem, QWidget, QMenu, QHeaderView, QFileDialog, QMessageBox
 from PyQt6.QtCore import Qt, QEvent
 from PyQt6.QtGui import QAction
-import os, eyed3
-import threading
-import time
+import os, eyed3, threading, time, sqlite3
 
 class MainWindow(QMainWindow):
     def changeMedia(self, musicID: int) -> None: ...
@@ -39,7 +37,7 @@ class PlaylistTable(QTableWidget):
         self.__contextMenu.addAction('Удалить')
         self.__contextMenu.triggered.connect(self.menuPressed)
 
-        path = R'C:\Users\Zombie\Desktop\по мелочи\music'
+        path = self.getPath()
         self.loadPlaylistThread = threading.Thread(target=lambda:[self.loadPlaylist(path)])
 
     def menuPressed(self, action: QAction) -> None:
@@ -50,13 +48,14 @@ class PlaylistTable(QTableWidget):
                 print("remove")
 
     def loadPlaylist(self, path: str) -> None:
+        while self.rowCount() > 0:
+            self.removeRow(self.rowCount()-1)
         count = 0
-        dist = {}
+        dictOfMedia = {}
         for root, dirs, files in os.walk(path):
             for file in files:
                 if file.endswith('.mp3'):
                     mp3 = eyed3.load(f"{path}\{file}")
-
                     self.insertRow(self.rowCount())
                     if mp3.tag.title != None and mp3.tag.artist != None:
                         self.setItem(self.rowCount()-1, 0, QTableWidgetItem(mp3.tag.title))
@@ -69,9 +68,9 @@ class PlaylistTable(QTableWidget):
                         duration = "--:--"
                     self.setItem(self.rowCount()-1, 2, QTableWidgetItem(duration))
                     count += 1
-                    dist[count] = f"{path}\\{file}"
+                    dictOfMedia[count] = f"{path}\\{file}"
             break
-        self.playlist = dist
+        self.playlist = dictOfMedia
         time.sleep(0.05)
         if self.verticalScrollBar().isVisible():
             self.setColumnWidth(0, ((self.myParent.width() * 39) // 100))
@@ -88,3 +87,25 @@ class PlaylistTable(QTableWidget):
                 self.myParent.changeMedia(self.itemAt(event.pos()).row()+1)
                 self.myParent.play()
         return super(PlaylistTable, self).eventFilter(source, event)
+    
+    def getPath(self) -> str:
+        connect = sqlite3.connect("database.db")
+        cursor = connect.cursor()
+        path = cursor.execute("SELECT path FROM pathToDir").fetchone()[0]
+        connect.close()
+        return path
+    
+    def changeDir(self) -> None:
+        newPath = QFileDialog.getExistingDirectory(directory=os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop'))
+        print(newPath)
+
+        connect = sqlite3.connect("database.db")
+        cursor = connect.cursor()
+        
+        cursor.execute("UPDATE pathToDir SET path=?", (newPath,))
+
+        connect.commit()
+        connect.close()
+
+        loadPlaylistThread = threading.Thread(target=lambda:[self.loadPlaylist(newPath)])
+        loadPlaylistThread.start()

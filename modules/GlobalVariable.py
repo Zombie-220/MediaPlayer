@@ -18,6 +18,10 @@ MUTE_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\mute
 REPEAT_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\repeat.png')
 RANDOM_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\random.png')
 WARNING_ICON = QPixmap(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\warning.png').scaled(25,25,transformMode=Qt.TransformationMode.SmoothTransformation)
+FOLDER_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\folder.png')
+MINI_WINDOW_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\miniWindow.png')
+DOTS_ICON = QPixmap(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\dots.png').scaled(15,15,transformMode=Qt.TransformationMode.SmoothTransformation)
+FULLSCREEN_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\fullscreen.png')
 
 CSS = '''
     * {
@@ -27,7 +31,7 @@ CSS = '''
     #TitleBar {
         background-color: rgb(21,21,21);
     }
-    #MainWindow, QToolTip {
+    #MainWindow, QToolTip, #MiniWindow {
         background-color: rgb(40,40,40);
         border: 1px solid rgb(21,21,21);
     }

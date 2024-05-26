@@ -2,12 +2,12 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QSlider
 from PyQt6.QtCore import Qt, QUrl, QSize
 from PyQt6.QtGui import QIcon, QColor
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
-import sys, time, eyed3, random, threading
+import sys, time, eyed3, random, threading, sqlite3
 
 from modules.GlobalVariable import *
 from modules.SimpleModules import WindowTitleBar, Button, LineEntry, Label
 from modules.PlaylistTable import PlaylistTable
-from modules.WarningWindow import WarningWindow
+from modules.MiniWindow import MiniWindow
 
 class MainWindow(QMainWindow):
     def __init__(self, title: str):
@@ -19,6 +19,7 @@ class MainWindow(QMainWindow):
         self.__repeatTrack: bool = False
         self.__randomEnabled: bool = False
         self.__listOfTracks: list[int] = []
+        self.mustCheckAudioOut: bool = True
 
         self.setWindowIcon(QIcon(self.icon))
         self.setWindowTitle(self.title)
@@ -32,8 +33,13 @@ class MainWindow(QMainWindow):
         btn_close.setToolTip("Закрыть окно")
         btn_showMinimize = Button(self, MINIMIZE_ICON, self.width()-60, 0, 30, 30, "btn_orange_transp", self.showMinimized)
         btn_showMinimize.setToolTip("Свернуть окно")
-
         self.playlist = PlaylistTable(self, 1, windowHat.height(), self.width()-2, self.height()-140)
+        btn_changeRep = Button(self, FOLDER_ICON, self.width()-120, 0, 30, 30, "btn_orange_transp", self.playlist.changeDir)
+        btn_changeRep.setToolTip("Выбрать папку")
+        btn_changeRep.setIconSize(QSize(20,20))
+        btn_openMiniWindow = Button(self, MINI_WINDOW_ICON, self.width()-90, 0, 30, 30, "btn_orange_transp", self.openMiniWindow)
+        btn_openMiniWindow.setToolTip("Открыть мини проигрыватель")
+        btn_openMiniWindow.setIconSize(QSize(20,20))
 
         self.__btnPlay = Button(self, PLAY_ICON, 10, self.playlist.pos().y()+self.playlist.height()+10, 125, 50, "btn_orange", self.changePlaybackState)
         self.__btnPlay.setIconSize(QSize(30,30))
@@ -45,6 +51,8 @@ class MainWindow(QMainWindow):
         btnNext = Button(self, NEXT_ICON, btnPrevious.pos().x()+btnPrevious.width()+5, self.__btnPlay.pos().y()+self.__btnPlay.height()+10, 60, 30, "btn_orange", self.nextTrack)
         btnNext.setShortcut(Qt.Key.Key_Right)
         btnNext.setToolTip("Следующий трэк")
+
+        self.miniWindow = MiniWindow(self)
 
         self.__mediaPlayer = QMediaPlayer(self)
         self.__audioOutput = QAudioOutput(self)
@@ -87,7 +95,7 @@ class MainWindow(QMainWindow):
 
         self.__btnRandom = Button(self, RANDOM_ICON, btnAddVolume.pos().x()+btnAddVolume.width()+10, btnAddVolume.pos().y(), 30, 30, "btn_orange", self.enableRandom)
         self.__btnRandom.setIconSize(QSize(20,20))
-        self.__btnRandom.setToolTip("Воспроизводить в случайном пордке")
+        self.__btnRandom.setToolTip("Воспроизводить в случайном порядке")
         self.__btnRandom.setStyleSheet(SPECIAL_BTN_CSS)
         self.__btnRepeat = Button(self, REPEAT_ICON, self.__btnRandom.pos().x(), self.__btnMute.pos().y(), 30, 30, "btn_orange", self.enableRepeat)
         self.__btnRepeat.setIconSize(QSize(20,20))
@@ -100,7 +108,9 @@ class MainWindow(QMainWindow):
         self.__labelNames.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
     def closeEvent(self, event) -> None:
+        self.mustCheckAudioOut = False
         self.close()
+        self.miniWindow.close()
 
     def changePlaybackState(self) -> None:
         match self.__mediaPlayer.playbackState():
@@ -182,18 +192,24 @@ class MainWindow(QMainWindow):
         self.__playbackState = True
         self.__btnPlay.setIcon(PAUSE_ICON)
         self.__btnPlay.setToolTip("Остановить")
+        self.miniWindow.btn_play.setIcon(PAUSE_ICON)
+        self.miniWindow.setToolTip("Остановить")
 
     def pause(self) -> None:
         self.__mediaPlayer.pause()
         self.__playbackState = False
         self.__btnPlay.setIcon(PLAY_ICON)
         self.__btnPlay.setToolTip("Проиграть")
+        self.miniWindow.btn_play.setIcon(PLAY_ICON)
+        self.miniWindow.btn_play.setToolTip("Проиграть")
 
     def stop(self) -> None:
         self.__mediaPlayer.stop()
         self.__playbackState = False
         self.__btnPlay.setIcon(PLAY_ICON)
         self.__btnPlay.setToolTip("Проиграть")
+        self.miniWindow.btn_play.setIcon(PLAY_ICON)
+        self.miniWindow.btn_play.setToolTip("Проиграть")
 
     def reduceVolume(self) -> None:
         self.__sliderVolume.setValue(self.__sliderVolume.value()-1)
@@ -230,7 +246,7 @@ class MainWindow(QMainWindow):
         self.__btnRandom.setStyleSheet(SPECIAL_BTN_CSS)
 
     def checkAudioOut(self) -> None:
-        while self.isVisible():
+        while self.mustCheckAudioOut:
             if self.__mediaPlayer.audioOutput() != None:
                 if self.__mediaPlayer.audioOutput().device() != QAudioOutput().device():
                     self.__audioOutput = QAudioOutput()
@@ -241,6 +257,10 @@ class MainWindow(QMainWindow):
                 self.__audioOutput.setVolume(self.__sliderVolume.value() / 100)
                 self.__mediaPlayer.setAudioOutput(self.__audioOutput)
             time.sleep(1)
+
+    def openMiniWindow(self) -> None:
+        self.hide()
+        self.miniWindow.show()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
