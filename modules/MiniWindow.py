@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QMainWindow, QApplication
-from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtCore import Qt, QSize, QPoint
 from PyQt6.QtGui import QIcon, QMouseEvent
 
 from modules.SimpleModules import Label, Button
@@ -14,25 +14,32 @@ class MainWindow(QMainWindow):
 class MoveLabel(Label):
     def __init__(self, parent: QMainWindow, width: int, height: int, objectName: str, content: str | QPixmap):
         self.myParent = parent
-        self.screenSize = QApplication.primaryScreen().availableGeometry()
+        self.__screenSize = QApplication.primaryScreen().availableGeometry()
         super().__init__(parent, 0, 0, width, height, objectName, content)
 
     def mousePressEvent(self, LeftButton: QMouseEvent) -> None:
-        self.pos = LeftButton.pos()
-        self.main_pos = self.myParent.pos()
+        self.__x_pos = LeftButton.pos().x()
+        self.__y_pos = LeftButton.pos().y()
+        self.__main_pos = self.myParent.pos()
 
     def mouseMoveEvent(self, LeftButton: QMouseEvent) -> None:
-        self.last_pos = LeftButton.pos() - self.pos
-        self.main_pos += self.last_pos
-        self.myParent.move(0, self.main_pos.y())
+        if self.myParent.pos().x() == 0:
+            if LeftButton.pos().x() <= self.__screenSize.width() // 2: self.__last_pos = QPoint(0, LeftButton.pos().y() - self.__y_pos)
+            else: self.__last_pos = QPoint(self.__screenSize.width() - self.myParent.width(), LeftButton.pos().y() - self.__x_pos)
+        elif self.myParent.pos().x() == self.__screenSize.width() - self.myParent.width():
+            if -(LeftButton.pos().x()) <= self.__screenSize.width() // 2: self.__last_pos = QPoint(0, LeftButton.pos().y() - self.__y_pos)
+            else: self.__last_pos = QPoint(-(self.__screenSize.width() - self.myParent.width()), LeftButton.pos().y() - self.__x_pos)
+        self.__main_pos += self.__last_pos
+        self.myParent.move(self.__main_pos)
 
 class MiniWindow(QMainWindow):
     def __init__(self, parent: MainWindow):
         super().__init__()
         self.myParent = parent
+        self.__screenSize = QApplication.primaryScreen().availableGeometry()
 
         self.setFixedSize(30,180)
-        self.move(0, 100)
+        self.move(0, self.__screenSize.height()//2 - self.height()//2)
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.WindowStaysOnTopHint)
         self.setWindowIcon(QIcon(APP_ICON))
         self.setWindowTitle(self.myParent.title)

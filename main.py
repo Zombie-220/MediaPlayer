@@ -134,7 +134,7 @@ class MainWindow(QMainWindow):
             else:
                 if self.__nowPlaying <= 1: nextTrack = len(self.playlist.playlist)
                 else: nextTrack = self.__nowPlaying - 1
-        self.changeMedia(nextTrack)
+            self.changeMedia(nextTrack)
         if self.__playbackState: self.play()
 
     def nextTrack(self) -> None:
