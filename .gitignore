@@ -1,5 +1,6 @@
 .vscode/
 __pycache__/
+oldVersion/
 
 test_*
 database.db

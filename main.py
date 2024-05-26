@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QSlider
 from PyQt6.QtCore import Qt, QUrl, QSize
 from PyQt6.QtGui import QIcon, QColor
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
-import sys, time, eyed3, random, threading, sqlite3
+import sys, time, eyed3, random, threading
 
 from modules.GlobalVariable import *
 from modules.SimpleModules import WindowTitleBar, Button, LineEntry, Label
@@ -210,6 +210,7 @@ class MainWindow(QMainWindow):
         self.__btnPlay.setToolTip("Проиграть")
         self.miniWindow.btn_play.setIcon(PLAY_ICON)
         self.miniWindow.btn_play.setToolTip("Проиграть")
+        self.__labelNames.setText("Исполнитель: >_<\nНазвание: >_<")
 
     def reduceVolume(self) -> None:
         self.__sliderVolume.setValue(self.__sliderVolume.value()-1)

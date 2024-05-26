@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QMainWindow, QTableWidget, QAbstractItemView, QTableWidgetItem, QWidget, QMenu, QHeaderView, QFileDialog, QMessageBox
+from PyQt6.QtWidgets import QMainWindow, QTableWidget, QAbstractItemView, QTableWidgetItem, QWidget, QMenu, QHeaderView, QFileDialog
 from PyQt6.QtCore import Qt, QEvent
 from PyQt6.QtGui import QAction
 import os, eyed3, threading, time, sqlite3
@@ -6,6 +6,7 @@ import os, eyed3, threading, time, sqlite3
 class MainWindow(QMainWindow):
     def changeMedia(self, musicID: int) -> None: ...
     def play(self) -> None: ...
+    def stop(self) -> None: ...
 
 class PlaylistTable(QTableWidget):
     def __init__(self, parent: MainWindow,
@@ -96,6 +97,7 @@ class PlaylistTable(QTableWidget):
         return path
     
     def changeDir(self) -> None:
+        self.myParent.stop()
         newPath = QFileDialog.getExistingDirectory(directory=os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop'))
         print(newPath)
 
