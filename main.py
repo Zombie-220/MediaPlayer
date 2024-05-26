@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QSlider
 from PyQt6.QtCore import Qt, QUrl, QSize
 from PyQt6.QtGui import QIcon, QColor
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
-import sys, time, eyed3, random
+import sys, time, eyed3, random, threading
 
 from modules.GlobalVariable import *
 from modules.SimpleModules import WindowTitleBar, Button, LineEntry, Label
@@ -46,13 +46,13 @@ class MainWindow(QMainWindow):
         btnNext.setShortcut(Qt.Key.Key_Right)
         btnNext.setToolTip("Следующий трэк")
 
-        self.__mediaPlayer = QMediaPlayer()
-        self.__audioOutput = QAudioOutput()
-        self.__audioOutput.setVolume(0.5)
+        self.__mediaPlayer = QMediaPlayer(self)
+        self.__audioOutput = QAudioOutput(self)
         self.__mediaPlayer.setAudioOutput(self.__audioOutput)
         self.__mediaPlayer.durationChanged.connect(lambda d: [self.__sliderDuration.setRange(0, d)])
         self.__mediaPlayer.positionChanged.connect(self.changeTimecode)
         self.__mediaPlayer.mediaStatusChanged.connect(self.mediaStatusChanged)
+        self.checkAudioOutThread = threading.Thread(target=self.checkAudioOut)
 
         btnReduceVolume = Button(self, REDUCE_VOLUME_ICON, self.__btnPlay.pos().x()+self.__btnPlay.width()+10, self.__btnPlay.pos().y(), 30, 30, "btn_orange", self.reduceVolume)
         btnReduceVolume.setToolTip("Уменьшить громкость")
@@ -229,12 +229,23 @@ class MainWindow(QMainWindow):
         else: self.__btnRandom.setObjectName("btn_orange")
         self.__btnRandom.setStyleSheet(SPECIAL_BTN_CSS)
 
+    def checkAudioOut(self) -> None:
+        while self.isVisible():
+            if self.__mediaPlayer.audioOutput() != None:
+                if self.__mediaPlayer.audioOutput().device() != QAudioOutput().device():
+                    self.__audioOutput = QAudioOutput()
+                    self.__audioOutput.setVolume(self.__sliderVolume.value() / 100)
+                    self.__mediaPlayer.setAudioOutput(self.__audioOutput)
+            else:
+                self.__audioOutput = QAudioOutput()
+                self.__audioOutput.setVolume(self.__sliderVolume.value() / 100)
+                self.__mediaPlayer.setAudioOutput(self.__audioOutput)
+            time.sleep(1)
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow("Media player")
-    warningWindow = WarningWindow()
     window.show()
     window.playlist.loadPlaylistThread.start()
+    window.checkAudioOutThread.start()
     sys.exit(app.exec())
-
-# повтор, там таймлайн не переводится на начало, после окончания трека
