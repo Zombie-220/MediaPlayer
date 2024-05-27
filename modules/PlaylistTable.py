@@ -3,10 +3,7 @@ from PyQt6.QtCore import Qt, QEvent
 from PyQt6.QtGui import QAction
 import os, eyed3, threading, time, sqlite3
 
-class MainWindow(QMainWindow):
-    def changeMedia(self, musicID: int) -> None: ...
-    def play(self) -> None: ...
-    def stop(self) -> None: ...
+class MainWindow(QMainWindow): ...
 
 class PlaylistTable(QTableWidget):
     def __init__(self, parent: MainWindow,
@@ -85,8 +82,8 @@ class PlaylistTable(QTableWidget):
         elif (event.type() == QEvent.Type.MouseButtonDblClick and event.buttons() == Qt.MouseButton.LeftButton):
             item = self.itemAt(event.pos())
             if item:
-                self.myParent.changeMedia(self.itemAt(event.pos()).row()+1)
-                self.myParent.play()
+                self.myParent.buttonInterface.changeMedia(self.itemAt(event.pos()).row()+1)
+                self.myParent.buttonInterface.play()
         return super(PlaylistTable, self).eventFilter(source, event)
     
     def getPath(self) -> str:
