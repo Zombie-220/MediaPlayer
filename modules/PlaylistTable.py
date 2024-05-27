@@ -70,8 +70,12 @@ class PlaylistTable(QTableWidget):
                     dictOfMedia[count] = f"{path}\\{file}"
             break
         self.playlist = dictOfMedia
-        if self.playlist == {}: self.myParent.buttonInterface.setDisabled(True)
-        else: self.myParent.buttonInterface.setDisabled(False)
+        if self.playlist == {}:
+            self.myParent.buttonInterface.setDisabled(True)
+            self.myParent.btn_openMiniWindow.setDisabled(True)
+        else:
+            self.myParent.buttonInterface.setDisabled(False)
+            self.myParent.btn_openMiniWindow.setDisabled(False)
         time.sleep(0.05)
         if self.verticalScrollBar().isVisible():
             self.setColumnWidth(0, ((self.myParent.width() * 39) // 100))

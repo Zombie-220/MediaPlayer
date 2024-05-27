@@ -39,9 +39,9 @@ class MainWindow(QMainWindow):
         btn_changeRep = Button(self, FOLDER_ICON, self.width()-120, 0, 30, 30, "btn_orange_transp", self.playlist.changeDir)
         btn_changeRep.setToolTip("Выбрать папку")
         btn_changeRep.setIconSize(QSize(20,20))
-        btn_openMiniWindow = Button(self, MINI_WINDOW_ICON, self.width()-90, 0, 30, 30, "btn_orange_transp", self.openMiniWindow)
-        btn_openMiniWindow.setToolTip("Открыть мини проигрыватель")
-        btn_openMiniWindow.setIconSize(QSize(20,20))
+        self.btn_openMiniWindow = Button(self, MINI_WINDOW_ICON, self.width()-90, 0, 30, 30, "btn_orange_transp", self.openMiniWindow)
+        self.btn_openMiniWindow.setToolTip("Открыть мини проигрыватель")
+        self.btn_openMiniWindow.setIconSize(QSize(20,20))
 
         self.mediaPlayer = QMediaPlayer(self)
         self.__audioOutput = QAudioOutput(self)
