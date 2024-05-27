@@ -80,15 +80,16 @@ class PlaylistTable(QTableWidget):
         if (event.type() == QEvent.Type.MouseButtonPress and event.buttons() == Qt.MouseButton.RightButton):
             item = self.itemAt(event.pos())
             if item:
-                self.__contextMenu.move(event.pos().x() + self.myParent.pos().x(), event.pos().y() + self.myParent.pos().y())
-                self.__contextMenu.show()
+                # self.__contextMenu.move(event.pos().x() + self.myParent.pos().x(), event.pos().y() + self.myParent.pos().y())
+                # self.__contextMenu.show()
+                pass
         elif (event.type() == QEvent.Type.MouseButtonDblClick and event.buttons() == Qt.MouseButton.LeftButton):
             item = self.itemAt(event.pos())
             if item:
                 self.myParent.buttonInterface.changeMedia(self.itemAt(event.pos()).row()+1)
                 self.myParent.buttonInterface.play()
         return super(PlaylistTable, self).eventFilter(source, event)
-    
+
     def getPath(self) -> str:
         connect = sqlite3.connect("database.db")
         cursor = connect.cursor()
