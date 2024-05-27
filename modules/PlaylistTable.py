@@ -69,6 +69,8 @@ class PlaylistTable(QTableWidget):
                     dictOfMedia[count] = f"{path}\\{file}"
             break
         self.playlist = dictOfMedia
+        if self.playlist == {}: self.myParent.buttonInterface.setDisabled(True)
+        else: self.myParent.buttonInterface.setDisabled(False)
         time.sleep(0.05)
         if self.verticalScrollBar().isVisible():
             self.setColumnWidth(0, ((self.myParent.width() * 39) // 100))
@@ -89,14 +91,20 @@ class PlaylistTable(QTableWidget):
     def getPath(self) -> str:
         connect = sqlite3.connect("database.db")
         cursor = connect.cursor()
-        path = cursor.execute("SELECT path FROM pathToDir").fetchone()[0]
+        if cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='pathToDir'").fetchone() == None:
+            cursor.execute("CREATE TABLE pathToDir (id INTEGER PRIMARY KEY, path TEXT NOT NULL)")
+            newPath = QFileDialog.getExistingDirectory(directory=os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop'))
+            cursor.execute("INSERT INTO pathToDir (path) VALUES (?)", (newPath,))
+            connect.commit()
+            path = newPath
+        else:
+            path = cursor.execute("SELECT path FROM pathToDir").fetchone()[0]
         connect.close()
         return path
     
     def changeDir(self) -> None:
-        self.myParent.stop()
+        self.myParent.buttonInterface.stop()
         newPath = QFileDialog.getExistingDirectory(directory=os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop'))
-        print(newPath)
 
         connect = sqlite3.connect("database.db")
         cursor = connect.cursor()
