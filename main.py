@@ -9,6 +9,7 @@ from modules.SimpleModules import WindowTitleBar, Button
 from modules.PlaylistTable import PlaylistTable
 from modules.MiniWindow import MiniWindow
 from modules.ButtonInterface import ButtonInterface
+from modules.WarningWindow import WarningWindow
 
 class MainWindow(QMainWindow):
     def __init__(self, title: str):
@@ -53,6 +54,8 @@ class MainWindow(QMainWindow):
         self.mediaPlayer.positionChanged.connect(self.buttonInterface.changeTimecode)
         self.mediaPlayer.mediaStatusChanged.connect(self.buttonInterface.mediaStatusChanged)
         self.checkAudioOutThread = threading.Thread(target=self.checkAudioOut)
+
+        self.warningWindow = WarningWindow(self)
 
     def closeEvent(self, event) -> None:
         self.mustCheckAudioOut = False

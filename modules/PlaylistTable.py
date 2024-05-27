@@ -35,8 +35,8 @@ class PlaylistTable(QTableWidget):
         self.__contextMenu.addAction('Удалить')
         self.__contextMenu.triggered.connect(self.menuPressed)
 
-        path = self.getPath()
-        self.loadPlaylistThread = threading.Thread(target=lambda:[self.loadPlaylist(path)])
+        self.path = self.getPath()
+        self.loadPlaylistThread = threading.Thread(target=lambda:[self.loadPlaylist(self.path)])
 
     def menuPressed(self, action: QAction) -> None:
         match action.text():
@@ -48,6 +48,7 @@ class PlaylistTable(QTableWidget):
     def loadPlaylist(self, path: str) -> None:
         while self.rowCount() > 0:
             self.removeRow(self.rowCount()-1)
+        self.myParent.nowPlaying = 1
         count = 0
         dictOfMedia = {}
         for root, dirs, files in os.walk(path):
@@ -101,18 +102,31 @@ class PlaylistTable(QTableWidget):
             path = cursor.execute("SELECT path FROM pathToDir").fetchone()[0]
         connect.close()
         return path
-    
+
     def changeDir(self) -> None:
         self.myParent.buttonInterface.stop()
         newPath = QFileDialog.getExistingDirectory(directory=os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop'))
+        dirHasMP3 = False
 
-        connect = sqlite3.connect("database.db")
-        cursor = connect.cursor()
-        
-        cursor.execute("UPDATE pathToDir SET path=?", (newPath,))
+        for root, dirs, files in os.walk(newPath):
+            for file in files:
+                if file.endswith(".mp3"):
+                    dirHasMP3 = True
+                    break
+            break
 
-        connect.commit()
-        connect.close()
+        if not (dirHasMP3):
+            self.myParent.warningWindow.show()
+            self.myParent.setDisabled(True)
+        else:
+            self.path = newPath
+            loadListThread = threading.Thread(target=lambda:[self.loadPlaylist(self.path)])
+            loadListThread.start()
 
-        loadPlaylistThread = threading.Thread(target=lambda:[self.loadPlaylist(newPath)])
-        loadPlaylistThread.start()
+            connect = sqlite3.connect("database.db")
+            cursor = connect.cursor()
+            
+            cursor.execute("UPDATE pathToDir SET path=?", (self.path,))
+
+            connect.commit()
+            connect.close()
