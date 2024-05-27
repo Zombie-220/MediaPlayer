@@ -1,6 +1,9 @@
 .vscode/
 __pycache__/
 oldVersion/
+build/
 
 test_*
 database.db
+dist/database.db
+*.spec

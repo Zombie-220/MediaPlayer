@@ -83,3 +83,5 @@ if __name__ == '__main__':
     window.playlist.loadPlaylistThread.start()
     window.checkAudioOutThread.start()
     sys.exit(app.exec())
+
+# pyinstaller -F -w -i "images/app.ico" -n "Media player" main.py
