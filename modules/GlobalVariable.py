@@ -154,3 +154,33 @@ SPECIAL_BTN_CSS = '''
         background-color: rgba(200,0,0,0.4);
     }
 '''
+
+WARNING_WINDOW_CSS = '''
+    * {
+        color: rgb(0,0,0);
+        font-size: 14px;
+    }
+    #WarningWindow {
+        background-color: rgb(21,21,21);
+        border: 1px solid rgb(255,88,0);
+    }
+    #WarningWindowTitle {
+        background-color: rgb(255,88,0);
+    }
+    #label {
+        background-color: rgba(0,0,0,0);
+        color: rgb(240,240,240);
+        font-size: 14px;
+    }
+    #btn {
+        background-color: rgba(40,40,40,0);
+        border: 1px solid rgb(255,88,0);
+        color: rgb(255,255,255);
+    }
+    #btn:hover {
+        background-color: rgba(40,40,40,0.4);
+    }
+    #btn:pressed {
+        background-color: rgba(40,40,40,0.8);
+    }
+'''
