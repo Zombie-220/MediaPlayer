@@ -1,11 +1,14 @@
 from PyQt6.QtWidgets import QMainWindow, QApplication
 from PyQt6.QtCore import Qt, QSize, QPoint
-from PyQt6.QtGui import QIcon, QMouseEvent
+from PyQt6.QtGui import QIcon, QPixmap, QMouseEvent
 
 from modules.SimpleModules import Label, Button
-from modules.GlobalVariable import *
+from modules.GlobalVariable import APP_ICON, CSS, CLOSE_ICON, FULLSCREEN_ICON, NEXT_ICON, PLAY_ICON,PREVIOUS_ICON, DOTS_ICON
 
-class MainWindow(QMainWindow): ...
+class MainWindow(QMainWindow):
+    def nextTrack(self) -> None: ...
+    def changePlaybackState(self) -> None: ...
+    def previousTrack(self) -> None: ...
 
 class MoveLabel(Label):
     def __init__(self, parent: QMainWindow, width: int, height: int, objectName: str, content: str | QPixmap):
@@ -47,13 +50,13 @@ class MiniWindow(QMainWindow):
         btn_showMainWindow = Button(self, FULLSCREEN_ICON, 0, self.height()-60, 30, 30, "btn_orange_transp", self.showMainWindow)
         btn_showMainWindow.setToolTip("Открыть проигрыватель")
         
-        btn_nextTrack = Button(self, NEXT_ICON, 0, self.height()-90, 30, 30, "btn_orange_transp", self.myParent.buttonInterface.nextTrack)
+        btn_nextTrack = Button(self, NEXT_ICON, 0, self.height()-90, 30, 30, "btn_orange_transp", self.myParent.nextTrack)
         btn_nextTrack.setToolTip("Следующий трэк")
         btn_nextTrack.setIconSize(QSize(20,20))
-        self.btn_play = Button(self, PLAY_ICON, 0, self.height()-120, 30, 30, "btn_orange_transp", self.myParent.buttonInterface.changePlaybackState)
+        self.btn_play = Button(self, PLAY_ICON, 0, self.height()-120, 30, 30, "btn_orange_transp", self.myParent.changePlaybackState)
         self.btn_play.setToolTip("Проиграть")
         self.btn_play.setIconSize(QSize(20,20))
-        btn_previous = Button(self, PREVIOUS_ICON, 0, self.height()-150, 30, 30, "btn_orange_transp", self.myParent.buttonInterface.previousTrack)
+        btn_previous = Button(self, PREVIOUS_ICON, 0, self.height()-150, 30, 30, "btn_orange_transp", self.myParent.previousTrack)
         btn_previous.setToolTip("Предыдущий трэк")
         btn_previous.setIconSize(QSize(20,20))
 
