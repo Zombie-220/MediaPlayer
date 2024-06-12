@@ -146,10 +146,14 @@ class ButtonInterface(Label):
             try: self.myParent.playlist.item(self.myParent.nowPlaying-1, i).setBackground(QColor(255,88,0,240))
             except: pass
         mp3 = eyed3.load(Rf"{self.myParent.playlist.playlist[musicID]}")
-        if mp3.tag.artist == None: artist = ">_<"
-        else: artist = mp3.tag.artist
-        if mp3.tag.title == None: title = ">_<"
-        else: title = mp3.tag.title
+        if mp3.tag != None:
+            if mp3.tag.artist == None: artist = ">_<"
+            else: artist = mp3.tag.artist
+            if mp3.tag.title == None: title = ">_<"
+            else: title = mp3.tag.title
+        else:
+            artist = ">_<"
+            title = ">_<"
         self.__labelNames.setText(f"Исполнитель: {artist}\nНазвание: {title}")
 
     def play(self) -> None:

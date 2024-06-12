@@ -56,10 +56,11 @@ class PlaylistTable(QTableWidget):
                 if file.endswith('.mp3'):
                     mp3 = eyed3.load(f"{path}\{file}")
                     self.insertRow(self.rowCount())
-                    if mp3.tag.title != None and mp3.tag.artist != None:
-                        self.setItem(self.rowCount()-1, 0, QTableWidgetItem(mp3.tag.title))
-                        self.setItem(self.rowCount()-1, 1, QTableWidgetItem(mp3.tag.artist))
-                        duration = f"{int(mp3.info.time_secs//60):02}:{int(mp3.info.time_secs%60):02}"
+                    if mp3.tag != None:
+                        if mp3.tag.title != None and mp3.tag.artist != None:
+                            self.setItem(self.rowCount()-1, 0, QTableWidgetItem(mp3.tag.title))
+                            self.setItem(self.rowCount()-1, 1, QTableWidgetItem(mp3.tag.artist))
+                            duration = f"{int(mp3.info.time_secs//60):02}:{int(mp3.info.time_secs%60):02}"
                     else:
                         time.sleep(0.05)
                         self.setSpan(self.rowCount()-1, 0, 1, 2)
