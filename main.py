@@ -79,17 +79,6 @@ class MainWindow(QMainWindow):
         self.hide()
         self.miniWindow.show()
 
-    # ----  Обёртки для функций у дочерних элементов ---- #
-
-    def nextTrack(self) -> None:
-        self.buttonInterface.nextTrack()
-    def changePlaybackState(self) -> None:
-        self.buttonInterface.changePlaybackState()
-    def previousTrack(self) -> None:
-        self.buttonInterface.previousTrack()
-
-    # ---- Конец обёрток для функций ---- #
-
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow("Media player")
