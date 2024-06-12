@@ -7,12 +7,14 @@ import os, threading, sqlite3
 from modules.SimpleModules import WindowTitleBar, Label, Button
 from modules.GlobalVariable import WARNING_ICON, WARNING_WINDOW_CSS
 
+from MainWindowHeader import MainWindow
+
 class WarningWindow(QMainWindow):
-    def __init__(self, mediaWindow: QMainWindow):
+    def __init__(self, mediaWindow: MainWindow):
         super().__init__()
         self.icon = WARNING_ICON
         self.title = "Ой-ой, что-то пошло не так"
-        self.mediaWindow = mediaWindow
+        self.__mediaWindow = mediaWindow
 
         self.setFixedSize(450, 200)
         self.setWindowIcon(QIcon(WARNING_ICON))
@@ -26,14 +28,14 @@ class WarningWindow(QMainWindow):
         btn_cancel = Button(self, "Отмена", (self.width()//2)-150-20, label.pos().y()+label.height()+25, 150, 30, "btn", self.cancel)
         btn_retry = Button(self, "Выбрать путь...", (self.width()//2)+20, label.pos().y()+label.height()+25, 150, 30, "btn", self.retry)
 
-        self.returnedVariable = None
+        # self.returnedVariable = None
 
     def cancel(self) -> None:
-        self.mediaWindow.setDisabled(False)
+        self.__mediaWindow.setDisabled(False)
         self.close()
 
     def retry(self) -> str:
-        self.mediaWindow.buttonInterface.stop()
+        self.__mediaWindow.buttonInterface.stop()
         newPath = QFileDialog.getExistingDirectory(directory=os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop'))
         dirHasMP3 = False
         for root, dirs, files in os.walk(newPath):
@@ -45,8 +47,8 @@ class WarningWindow(QMainWindow):
 
         if dirHasMP3:
             self.close()
-            self.mediaWindow.playlist.path = newPath
-            loadListThread = threading.Thread(target=lambda:[self.mediaWindow.playlist.loadPlaylist(self.mediaWindow.playlist.path)])
+            self.__mediaWindow.playlist.path = newPath
+            loadListThread = threading.Thread(target=lambda:[self.__mediaWindow.playlist.loadPlaylist(self.__mediaWindow.playlist.path)])
             loadListThread.start()
 
             connect = sqlite3.connect("database.db")
@@ -56,4 +58,4 @@ class WarningWindow(QMainWindow):
 
             connect.commit()
             connect.close()
-            self.mediaWindow.setDisabled(False)
+            self.__mediaWindow.setDisabled(False)

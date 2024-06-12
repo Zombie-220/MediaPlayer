@@ -1,9 +1,9 @@
-from PyQt6.QtWidgets import QMainWindow, QTableWidget, QAbstractItemView, QTableWidgetItem, QWidget, QMenu, QHeaderView, QFileDialog
+from PyQt6.QtWidgets import QTableWidget, QAbstractItemView, QTableWidgetItem, QWidget, QMenu, QHeaderView, QFileDialog
 from PyQt6.QtCore import Qt, QEvent
 from PyQt6.QtGui import QAction
 import os, eyed3, threading, time, sqlite3
 
-class MainWindow(QMainWindow): ...
+from MainWindowHeader import MainWindow
 
 class PlaylistTable(QTableWidget):
     def __init__(self, parent: MainWindow,
@@ -18,9 +18,9 @@ class PlaylistTable(QTableWidget):
         self.verticalHeader().setVisible(False)
         self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.setColumnWidth(0, ((parent.width() * 40) // 100))
-        self.setColumnWidth(1, ((parent.width() * 40) // 100))
-        self.setColumnWidth(2, ((parent.width() * 20) // 100))
+        self.setColumnWidth(0, ((self.width() * 40) // 100))
+        self.setColumnWidth(1, ((self.width() * 40) // 100))
+        self.setColumnWidth(2, ((self.width() * 20) // 100))
         self.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
         self.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Fixed)
         self.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.Fixed)
@@ -79,7 +79,7 @@ class PlaylistTable(QTableWidget):
             self.myParent.btn_openMiniWindow.setDisabled(False)
         time.sleep(0.05)
         if self.verticalScrollBar().isVisible():
-            self.setColumnWidth(0, ((self.myParent.width() * 39) // 100))
+            self.setColumnWidth(0, ((self.width() * 40) // 100))
 
     def eventFilter(self, source: QWidget, event: QEvent):
         if (event.type() == QEvent.Type.MouseButtonPress and event.buttons() == Qt.MouseButton.RightButton):

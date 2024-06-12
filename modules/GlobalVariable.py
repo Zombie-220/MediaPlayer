@@ -38,6 +38,9 @@ CSS = '''
     QToolTip {
         font-size: 12px;
     }
+    #ButtonInterface {
+        border-top: 1px solid rgb(21,21,21);
+    }
 
 
     #btn_red_transp {
@@ -85,7 +88,6 @@ CSS = '''
     #tablePlaylist {
         background-color: rgba(0,0,0,0);
         border: none;
-        border-bottom: 1px solid rgb(21,21,21);
     }
     QScrollBar:vertical {
         background-color: rgba(0,0,0,0);

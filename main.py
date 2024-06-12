@@ -27,7 +27,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(self.title)
         self.setStyleSheet(CSS)
         self.setObjectName("MainWindow")
-        self.setFixedSize(720, 560)
+        self.setFixedSize(960, 560)
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
 
         windowHat = WindowTitleBar(self, self.icon, self.title, "TitleBar")
@@ -35,7 +35,7 @@ class MainWindow(QMainWindow):
         btn_close.setToolTip("Закрыть окно")
         btn_showMinimize = Button(self, MINIMIZE_ICON, self.width()-60, 0, 30, 30, "btn_orange_transp", self.showMinimized)
         btn_showMinimize.setToolTip("Свернуть окно")
-        self.playlist = PlaylistTable(self, 1, windowHat.height(), self.width()-2, self.height()-140)
+        self.playlist = PlaylistTable(self, 1, windowHat.height(), ((self.width()-2) * 80) // 100, self.height()-140)
         btn_changeRep = Button(self, FOLDER_ICON, self.width()-120, 0, 30, 30, "btn_orange_transp", self.playlist.changeDir)
         btn_changeRep.setToolTip("Выбрать папку")
         btn_changeRep.setIconSize(QSize(20,20))
@@ -47,7 +47,7 @@ class MainWindow(QMainWindow):
         self.__audioOutput = QAudioOutput(self)
         self.mediaPlayer.setAudioOutput(self.__audioOutput)
 
-        self.buttonInterface = ButtonInterface(self, 0,windowHat.height()+self.playlist.height(), self.width(), self.height()-(windowHat.height()+self.playlist.height()), "label")
+        self.buttonInterface = ButtonInterface(self, 0,windowHat.height()+self.playlist.height(), self.width(), self.height()-(windowHat.height()+self.playlist.height()), "ButtonInterface")
         self.miniWindow = MiniWindow(self)
 
         self.mediaPlayer.durationChanged.connect(lambda d: [self.buttonInterface.sliderDuration.setRange(0, d)])

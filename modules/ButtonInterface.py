@@ -1,20 +1,14 @@
-from PyQt6.QtWidgets import QMainWindow, QSlider
+from PyQt6.QtWidgets import QSlider
 from PyQt6.QtCore import Qt, QSize, QUrl
 from PyQt6.QtGui import QColor
 from PyQt6.QtMultimedia import QMediaPlayer
 import random, eyed3, time
 
 from modules.SimpleModules import Label, Button, LineEntry
-from modules.GlobalVariable import *
+from modules.GlobalVariable import (PLAY_ICON, PREVIOUS_ICON, NEXT_ICON, REDUCE_VOLUME_ICON, ADD_VOLUME_ICON,
+                                    MUTE_ICON, SPECIAL_BTN_CSS, RANDOM_ICON, REPEAT_ICON, PAUSE_ICON)
 
-class MainWindow(QMainWindow):
-    nowPlaying: int
-    playbackState: bool
-    repeatTrack: bool
-    randomEnabled: bool
-    listOfTracks: list[int]
-
-    mediaPlayer: QMediaPlayer
+from MainWindowHeader import MainWindow
 
 class ButtonInterface(Label):
     def __init__(self, parent: MainWindow, x: int, y: int, width: int, height: int, objectName: str):

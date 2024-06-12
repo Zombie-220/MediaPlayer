@@ -5,13 +5,10 @@ from PyQt6.QtGui import QIcon, QPixmap, QMouseEvent
 from modules.SimpleModules import Label, Button
 from modules.GlobalVariable import APP_ICON, CSS, CLOSE_ICON, FULLSCREEN_ICON, NEXT_ICON, PLAY_ICON,PREVIOUS_ICON, DOTS_ICON
 
-class MainWindow(QMainWindow):
-    def nextTrack(self) -> None: ...
-    def changePlaybackState(self) -> None: ...
-    def previousTrack(self) -> None: ...
+from MainWindowHeader import MainWindow
 
 class MoveLabel(Label):
-    def __init__(self, parent: QMainWindow, width: int, height: int, objectName: str, content: str | QPixmap):
+    def __init__(self, parent: MainWindow, width: int, height: int, objectName: str, content: str | QPixmap):
         self.myParent = parent
         self.__screenSize = QApplication.primaryScreen().availableGeometry()
         super().__init__(parent, 0, 0, width, height, objectName, content)
