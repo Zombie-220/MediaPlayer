@@ -10,6 +10,7 @@ from modules.PlaylistTable import PlaylistTable
 from modules.MiniWindow import MiniWindow
 from modules.ButtonInterface import ButtonInterface
 from modules.WarningWindow import WarningWindow
+from modules.QueuePlaylist import QueuePlaylist
 
 class MainWindow(QMainWindow):
     def __init__(self, title: str):
@@ -56,6 +57,7 @@ class MainWindow(QMainWindow):
         self.checkAudioOutThread = threading.Thread(target=self.checkAudioOut)
 
         self.warningWindow = WarningWindow(self)
+        self.queuePlaylist = QueuePlaylist(self, self.playlist.width()+1, windowHat.height(), self.width()-self.playlist.width()-3, self.playlist.height())
 
     def closeEvent(self, event) -> None:
         self.mustCheckAudioOut = False

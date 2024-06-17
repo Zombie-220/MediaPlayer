@@ -41,6 +41,25 @@ CSS = '''
     #ButtonInterface {
         border-top: 1px solid rgb(21,21,21);
     }
+    #contextMenu {
+        background-color: rgb(40,40,40);
+        border: 1px solid rgb(21,21,21);
+        color: #fff;
+    }
+    #contextMenu::separator {
+        height: 2px;
+        margin-left: 5px;
+        margin-right: 5px;
+        margin-top: 4px;
+        margin-bottom: 4px;
+        background: rgb(21,21,21);
+    }
+    #contextMenu::item:selected {
+        background-color: rgba(21,21,21,0.8);
+    }
+    #contextMenu::item:pressed {
+        background-color: rgba(21,21,21,0.6);
+    }
 
 
     #btn_red_transp {
@@ -123,12 +142,8 @@ CSS = '''
     }
 
 
-    #WarningWindow {
-        background-color: rgb(21,21,21);
-        border: 1px solid rgb(255,88,0);
-    }
-    #WarningWindowTitle {
-        background-color: rgb(255,88,0);
+    #test {
+        border: 2px solid red;
     }
 '''
 

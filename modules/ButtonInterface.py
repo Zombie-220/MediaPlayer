@@ -147,7 +147,8 @@ class ButtonInterface(Label):
             else: title = mp3.tag.title
         else:
             artist = ">_<"
-            title = ">_<"
+            fullTitle = Rf"{self.myParent.playlist.playlist[musicID]}"
+            title = fullTitle[fullTitle.rfind("\\")+1:-4]
         self.__labelNames.setText(f"Исполнитель: {artist}\nНазвание: {title}")
 
     def play(self) -> None:

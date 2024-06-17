@@ -30,8 +30,11 @@ class PlaylistTable(QTableWidget):
         self.setHorizontalHeaderLabels(["Название", "Исполнтель", "Длительность"])
         self.viewport().installEventFilter(self)
 
-        self.__contextMenu = QMenu()
+        self.__contextMenu = QMenu(self)
+        self.__contextMenu.setObjectName('contextMenu')
         self.__contextMenu.addAction('Воспроизвести')
+        self.__contextMenu.addAction('Добавить в очередь')
+        self.__contextMenu.addSeparator()
         self.__contextMenu.addAction('Удалить')
         self.__contextMenu.triggered.connect(self.menuPressed)
 
@@ -42,6 +45,8 @@ class PlaylistTable(QTableWidget):
         match action.text():
             case 'Воспроизвести':
                 print("play")
+            case 'Добавить в очередь':
+                print("add")
             case 'Удалить':
                 print("remove")
 
@@ -85,8 +90,8 @@ class PlaylistTable(QTableWidget):
         if (event.type() == QEvent.Type.MouseButtonPress and event.buttons() == Qt.MouseButton.RightButton):
             item = self.itemAt(event.pos())
             if item:
-                # self.__contextMenu.move(event.pos().x() + self.myParent.pos().x(), event.pos().y() + self.myParent.pos().y())
-                # self.__contextMenu.show()
+                self.__contextMenu.move(self.myParent.pos().x() + self.pos().x() + event.pos().x() + 15, self.myParent.pos().y() + self.pos().y() + event.pos().y() + 40)
+                self.__contextMenu.show()
                 pass
         elif (event.type() == QEvent.Type.MouseButtonDblClick and event.buttons() == Qt.MouseButton.LeftButton):
             item = self.itemAt(event.pos())

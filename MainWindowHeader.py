@@ -46,6 +46,9 @@ class MiniWindow(QMainWindow):
 class WarningWindow(QMainWindow): ...
 
 
+class QueuePlaylist(QTableWidget): ...
+
+
 class MainWindow(QMainWindow):
     icon: QPixmap
     title: str
@@ -62,5 +65,6 @@ class MainWindow(QMainWindow):
     buttonInterface: ButtonInterface
     miniWindow: MiniWindow
     warningWindow: WarningWindow
+    queuePlaylist: QueuePlaylist
 
     checkAudioOutThread: threading.Thread

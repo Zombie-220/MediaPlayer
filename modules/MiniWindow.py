@@ -62,3 +62,6 @@ class MiniWindow(QMainWindow):
     def showMainWindow(self) -> None:
         self.hide()
         self.myParent.show()
+
+    def closeEvent(self, event) -> None:
+        self.myParent.closeEvent(event)
