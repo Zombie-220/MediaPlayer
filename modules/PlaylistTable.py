@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QTableWidget, QAbstractItemView, QTableWidgetItem, QWidget, QMenu, QHeaderView, QFileDialog
-from PyQt6.QtCore import Qt, QEvent
+from PyQt6.QtCore import Qt, QEvent, QPoint
 from PyQt6.QtGui import QAction
 import os, eyed3, threading, time, sqlite3
 
@@ -46,7 +46,7 @@ class PlaylistTable(QTableWidget):
             case 'Воспроизвести':
                 print("play")
             case 'Добавить в очередь':
-                print("add")
+                self.myParent.queuePlaylist.addToQueue(self.itemAt(action.sender().pos() - self.myParent.pos() - self.pos() - QPoint(15,40)).row()+1)
             case 'Удалить':
                 print("remove")
 

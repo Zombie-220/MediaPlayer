@@ -97,14 +97,18 @@ class ButtonInterface(Label):
         if self.myParent.playbackState: self.play()
 
     def nextTrack(self) -> None:
-        if self.myParent.randomEnabled:
-            if len(self.myParent.listOfTracks) == len(self.myParent.playlist.playlist): self.myParent.listOfTracks = []
-            nextTrack = random.randint(1, len(self.myParent.playlist.playlist))
-            while nextTrack in self.myParent.listOfTracks: nextTrack = random.randint(1, len(self.myParent.playlist.playlist))
-            self.myParent.listOfTracks.append(nextTrack)
+        if self.myParent.queuePlaylist.queue != []:
+            nextTrack = self.myParent.queuePlaylist.queue[0]
+            self.myParent.queuePlaylist.removeFromQueue(0)
         else:
-            if self.myParent.nowPlaying >= len(self.myParent.playlist.playlist): nextTrack = 1
-            else: nextTrack = self.myParent.nowPlaying + 1
+            if self.myParent.randomEnabled:
+                if len(self.myParent.listOfTracks) == len(self.myParent.playlist.playlist): self.myParent.listOfTracks = []
+                nextTrack = random.randint(1, len(self.myParent.playlist.playlist))
+                while nextTrack in self.myParent.listOfTracks: nextTrack = random.randint(1, len(self.myParent.playlist.playlist))
+                self.myParent.listOfTracks.append(nextTrack)
+            else:
+                if self.myParent.nowPlaying >= len(self.myParent.playlist.playlist): nextTrack = 1
+                else: nextTrack = self.myParent.nowPlaying + 1
         self.changeMedia(nextTrack)
         if self.myParent.playbackState: self.play()
 
