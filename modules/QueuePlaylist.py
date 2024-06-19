@@ -46,9 +46,12 @@ class QueuePlaylist(QTableWidget):
         tempTrack = self.myParent.playlist.playlist[musicID]
         mp3 = eyed3.load(tempTrack)
         if mp3.tag:
-            if mp3.tag.title:
-                self.insertRow(self.rowCount())
-                self.setItem(self.rowCount()-1, 0, QTableWidgetItem(mp3.tag.title))
+            if mp3.tag.title: title = mp3.tag.title
+        else:
+            fullTitle = Rf"{self.myParent.playlist.playlist[musicID]}"
+            title = fullTitle[fullTitle.rfind("\\")+1:-4]
+        self.insertRow(self.rowCount())
+        self.setItem(self.rowCount()-1, 0, QTableWidgetItem(title))
         self.queue.append(musicID)
 
     def removeFromQueue(self, musicID: int) -> None:

@@ -76,7 +76,18 @@ class ButtonInterface(Label):
             case QMediaPlayer.PlaybackState.PlayingState:
                 self.pause()
             case QMediaPlayer.PlaybackState.StoppedState:
-                self.changeMedia(self.myParent.nowPlaying)
+                if self.myParent.queuePlaylist.queue != []:
+                    nextTrack = self.myParent.queuePlaylist.queue[0]
+                    self.myParent.queuePlaylist.removeFromQueue(0)
+                else:
+                    if self.myParent.randomEnabled:
+                        if len(self.myParent.listOfTracks) == len(self.myParent.playlist.playlist): self.myParent.listOfTracks = []
+                        nextTrack = random.randint(1, len(self.myParent.playlist.playlist))
+                        while nextTrack in self.myParent.listOfTracks: nextTrack = random.randint(1, len(self.myParent.playlist.playlist))
+                        self.myParent.listOfTracks.append(nextTrack)
+                    else:
+                        nextTrack = self.myParent.nowPlaying
+                self.changeMedia(nextTrack)
                 self.play()
             case QMediaPlayer.PlaybackState.PausedState:
                 self.play()
