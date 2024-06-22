@@ -11,7 +11,7 @@ from modules.MiniWindow import MiniWindow
 from modules.ButtonInterface import ButtonInterface
 from modules.WarningWindow import WarningWindow
 from modules.QueuePlaylist import QueuePlaylist
-
+# начало рефакторинга
 class MainWindow(QMainWindow):
     def __init__(self, title: str):
         super().__init__()
