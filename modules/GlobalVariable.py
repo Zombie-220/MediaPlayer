@@ -28,49 +28,36 @@ CSS = '''
         color: rgb(240,240,240);
         font-size: 14px;
     }
-    #TitleBar {
+    #MainWindow, #border-comp, QToolTip {
+        background-color: rgb(40,40,40);
+        border: 1px solid rgb(21,21,21);
+    }
+    #dark-comp {
         background-color: rgb(21,21,21);
+        border: none;
     }
-    #MainWindow, QToolTip, #MiniWindow {
-        background-color: rgb(40,40,40);
-        border: 1px solid rgb(21,21,21);
+    #dark-comp-radius {
+        background-color: rgb(21,21,21);
+        border: none;
+        border-radius: 15px;
     }
-    QToolTip {
-        font-size: 12px;
-    }
-    #ButtonInterface {
-        border-top: 1px solid rgb(21,21,21);
-    }
-    #contextMenu {
-        background-color: rgb(40,40,40);
-        border: 1px solid rgb(21,21,21);
-        color: #fff;
-    }
-    #contextMenu::separator {
-        height: 2px;
-        margin-left: 5px;
-        margin-right: 5px;
-        margin-top: 4px;
-        margin-bottom: 4px;
-        background: rgb(21,21,21);
-    }
-    #contextMenu::item:selected {
-        background-color: rgba(21,21,21,0.8);
-    }
-    #contextMenu::item:pressed {
-        background-color: rgba(21,21,21,0.6);
+    #transp-comp {
+        background-color: rgba(0,0,0,0);
+        border: none;
     }
 
 
-    #btn_red_transp {
-        background-color: rgba(200,0,0,0);
-        border: 0px;
+
+    #btn_orange {
+        background-color: rgba(255,88,0,0.8);
+        border: 1px solid rgb(0,0,0);
+        border-radius: 15px;
     }
-    #btn_red_transp:hover {
-        background-color: rgba(200,0,0,0.3)
+    #btn_orange:hover {
+        background-color: rgba(255,88,0,0.6);
     }
-    #btn_red_transp:pressed {
-        background-color: rgba(200,0,0,0.6);
+    #btn_orange:pressed {
+        background-color: rgba(255,88,0,0.4);
     }
     #btn_orange_transp {
         background-color: rgba(255,88,0,0);
@@ -82,83 +69,7 @@ CSS = '''
     #btn_orange_transp:pressed {
         background-color: rgba(255,88,0,0.6);
     }
-    #btn_orange {
-        background-color: rgba(255,88,0,0.8);
-        border: 1px solid rgb(0,0,0);
-        border-radius: 15px;
-    }
-    #btn_orange:hover {
-        background-color: rgba(255,88,0,0.6);
-    }
-    #btn_orange:pressed {
-        background-color: rgba(255,88,0,0.4);
-    }
 
-    
-    QHeaderView {
-        background-color: rgba(0,0,0,0);
-    }
-    QHeaderView::section {
-        background-color: rgba(0,0,0,0);
-        border: 1px solid rgb(21,21,21);
-        font: bold;
-        padding-left: 5px;
-    }
-    #tablePlaylist {
-        background-color: rgba(0,0,0,0);
-        border: none;
-    }
-    QScrollBar:vertical {
-        background-color: rgba(0,0,0,0);
-        width: 7px;
-    }
-    QScrollBar::handle:vertical {
-        background-color: rgba(255,88,0,1);
-        border: 1px solid rgb(21,21,21);
-    }
-    QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
-        background-color: rgb(21,21,21);
-    }
-    QTableView::item:selected {
-        background: rgba(21,21,21,0.5);
-        color: rgb(240,240,240);
-        border: none;
-    }
-
-
-    #entry {
-        background-color: rgb(21,21,21);
-        border: none;
-        border-radius: 15px;
-    }
-    QSlider:groove {
-        border: 1px solid rgb(21,21,21);
-        border-radius: 5px;
-    }
-    QSlider:handle {
-        background-color: rgb(255,88,0);
-        border-radius: 3px;
-        width: 6px;
-    }
-
-
-    #test {
-        border: 2px solid red;
-    }
-'''
-
-SPECIAL_BTN_CSS = '''
-    #btn_orange {
-        background-color: rgba(255,88,0,0.8);
-        border: 1px solid rgb(0,0,0);
-        border-radius: 15px;
-    }
-    #btn_orange:hover {
-        background-color: rgba(255,88,0,0.6);
-    }
-    #btn_orange:pressed {
-        background-color: rgba(255,88,0,0.4);
-    }
     #btn_red {
         background-color: rgba(200,0,0,0.8);
         border: 1px solid rgb(0,0,0);
@@ -170,34 +81,29 @@ SPECIAL_BTN_CSS = '''
     #btn_red:pressed {
         background-color: rgba(200,0,0,0.4);
     }
-'''
+    #btn_red_transp {
+        background-color: rgba(200,0,0,0);
+        border: 0px;
+    }
+    #btn_red_transp:hover {
+        background-color: rgba(200,0,0,0.3)
+    }
+    #btn_red_transp:pressed {
+        background-color: rgba(200,0,0,0.6);
+    }
 
-WARNING_WINDOW_CSS = '''
-    * {
-        color: rgb(0,0,0);
-        font-size: 14px;
+
+
+    QToolTip {
+        font-size: 12px;
     }
-    #WarningWindow {
-        background-color: rgb(21,21,21);
-        border: 1px solid rgb(255,88,0);
+    QSlider:groove {
+        border: 1px solid rgb(21,21,21);
+        border-radius: 5px;
     }
-    #WarningWindowTitle {
+    QSlider:handle {
         background-color: rgb(255,88,0);
-    }
-    #label {
-        background-color: rgba(0,0,0,0);
-        color: rgb(240,240,240);
-        font-size: 14px;
-    }
-    #btn {
-        background-color: rgba(40,40,40,0);
-        border: 1px solid rgb(255,88,0);
-        color: rgb(255,255,255);
-    }
-    #btn:hover {
-        background-color: rgba(40,40,40,0.4);
-    }
-    #btn:pressed {
-        background-color: rgba(40,40,40,0.8);
+        border-radius: 3px;
+        width: 6px;
     }
 '''

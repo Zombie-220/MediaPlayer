@@ -1,17 +1,19 @@
 from PyQt6.QtWidgets import QApplication, QMainWindow
 from PyQt6.QtCore import Qt, QSize
-from PyQt6.QtGui import QIcon
+from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 import sys, time, threading
 
-from modules.GlobalVariable import *
+from modules.GlobalVariable import APP_ICON, CLOSE_ICON, MINIMIZE_ICON, FOLDER_ICON, MINI_WINDOW_ICON
+from modules.GlobalVariable import CSS
 from modules.SimpleModules import WindowTitleBar, Button
-from modules.PlaylistTable import PlaylistTable
-from modules.MiniWindow import MiniWindow
 from modules.ButtonInterface import ButtonInterface
-from modules.WarningWindow import WarningWindow
-from modules.QueuePlaylist import QueuePlaylist
-# начало рефакторинга
+
+# from modules.PlaylistTable import PlaylistTable
+# from modules.MiniWindow import MiniWindow
+# from modules.WarningWindow import WarningWindow
+# from modules.QueuePlaylist import QueuePlaylist
+
 class MainWindow(QMainWindow):
     def __init__(self, title: str):
         super().__init__()
@@ -31,61 +33,52 @@ class MainWindow(QMainWindow):
         self.setFixedSize(960, 560)
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
 
-        windowHat = WindowTitleBar(self, self.icon, self.title, "TitleBar")
+        windowHat = WindowTitleBar(self, self.icon, self.title, "dark-comp")
+        self._buttonInterface = ButtonInterface(self, 1, self.height()-301, self.width()-2, 300, "transp-widget")
+
         btn_close = Button(self, CLOSE_ICON, self.width()-30, 0, 30, 30, "btn_red_transp", self.closeEvent)
         btn_close.setToolTip("Закрыть окно")
         btn_showMinimize = Button(self, MINIMIZE_ICON, self.width()-60, 0, 30, 30, "btn_orange_transp", self.showMinimized)
         btn_showMinimize.setToolTip("Свернуть окно")
-        self.playlist = PlaylistTable(self, 1, windowHat.height(), ((self.width()-2) * 80) // 100, self.height()-140)
-        btn_changeRep = Button(self, FOLDER_ICON, self.width()-120, 0, 30, 30, "btn_orange_transp", self.playlist.changeDir)
+        # btn_changeRep = Button(self, FOLDER_ICON, self.width()-120, 0, 30, 30, "btn_orange_transp", self._playlist.changeDir)
+        btn_changeRep = Button(self, FOLDER_ICON, self.width()-120, 0, 30, 30, "btn_orange_transp")
         btn_changeRep.setToolTip("Выбрать папку")
         btn_changeRep.setIconSize(QSize(20,20))
-        self.btn_openMiniWindow = Button(self, MINI_WINDOW_ICON, self.width()-90, 0, 30, 30, "btn_orange_transp", self.openMiniWindow)
-        self.btn_openMiniWindow.setToolTip("Открыть мини проигрыватель")
-        self.btn_openMiniWindow.setIconSize(QSize(20,20))
+        # self._btn_openMiniWindow = Button(self, MINI_WINDOW_ICON, self.width()-90, 0, 30, 30, "btn_orange_transp", self.openMiniWindow)
+        self._btn_openMiniWindow = Button(self, MINI_WINDOW_ICON, self.width()-90, 0, 30, 30, "btn_orange_transp")
+        self._btn_openMiniWindow.setToolTip("Открыть мини проигрыватель")
+        self._btn_openMiniWindow.setIconSize(QSize(20,20))
 
-        self.mediaPlayer = QMediaPlayer(self)
-        self.__audioOutput = QAudioOutput(self)
-        self.mediaPlayer.setAudioOutput(self.__audioOutput)
+        self._mediaPlayer = QMediaPlayer(self)
+        self._audioOutput = QAudioOutput(self)
+        self._mediaPlayer.setAudioOutput(self._audioOutput)
 
-        self.buttonInterface = ButtonInterface(self, 0,windowHat.height()+self.playlist.height(), self.width(), self.height()-(windowHat.height()+self.playlist.height()), "ButtonInterface")
-        self.miniWindow = MiniWindow(self)
-
-        self.mediaPlayer.durationChanged.connect(lambda d: [self.buttonInterface.sliderDuration.setRange(0, d)])
-        self.mediaPlayer.positionChanged.connect(self.buttonInterface.changeTimecode)
-        self.mediaPlayer.mediaStatusChanged.connect(self.buttonInterface.mediaStatusChanged)
+        # self._mediaPlayer.durationChanged.connect(lambda d: [self._buttonInterface.sliderDuration.setRange(0, d)])
+        # self._mediaPlayer.positionChanged.connect(self._buttonInterface.changeTimecode)
+        # self._mediaPlayer.mediaStatusChanged.connect(self._buttonInterface.mediaStatusChanged)
         self.checkAudioOutThread = threading.Thread(target=self.checkAudioOut)
-
-        self.warningWindow = WarningWindow(self)
-        self.queuePlaylist = QueuePlaylist(self, self.playlist.width()+1, windowHat.height(), self.width()-self.playlist.width()-3, self.playlist.height())
 
     def closeEvent(self, event) -> None:
         self.mustCheckAudioOut = False
         self.close()
-        self.miniWindow.close()
 
     def checkAudioOut(self) -> None:
         while self.mustCheckAudioOut:
-            if self.mediaPlayer.audioOutput() != None:
-                if self.mediaPlayer.audioOutput().device() != QAudioOutput().device():
-                    self.__audioOutput = QAudioOutput()
-                    self.__audioOutput.setVolume(self.buttonInterface.sliderVolume.value() / 100)
-                    self.mediaPlayer.setAudioOutput(self.__audioOutput)
+            if self._mediaPlayer.audioOutput() != None:
+                if self._mediaPlayer.audioOutput().device() != QAudioOutput().device():
+                    self._audioOutput = QAudioOutput()
+                    self._audioOutput.setVolume(self._buttonInterface.sliderVolume.value() / 100)
+                    self._mediaPlayer.setAudioOutput(self._audioOutput)
             else:
-                self.__audioOutput = QAudioOutput()
-                self.__audioOutput.setVolume(self.buttonInterface.sliderVolume.value() / 100)
-                self.mediaPlayer.setAudioOutput(self.__audioOutput)
+                self._audioOutput = QAudioOutput()
+                self._audioOutput.setVolume(self._buttonInterface.sliderVolume.value() / 100)
+                self._mediaPlayer.setAudioOutput(self._audioOutput)
             time.sleep(1)
-
-    def openMiniWindow(self) -> None:
-        self.hide()
-        self.miniWindow.show()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = MainWindow("Media player")
+    window = MainWindow("MP3 player")
     window.show()
-    window.playlist.loadPlaylistThread.start()
     window.checkAudioOutThread.start()
     sys.exit(app.exec())
 

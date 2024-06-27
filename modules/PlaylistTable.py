@@ -9,7 +9,7 @@ class PlaylistTable(QTableWidget):
     def __init__(self, parent: MainWindow,
                  xPos: int, yPos:int, width: int, height: int):
         super().__init__(0, 3, parent)
-        self.myParent = parent
+        self._parent = parent
         self.playlist: dict = {}
 
         self.setObjectName("tablePlaylist")
@@ -30,13 +30,13 @@ class PlaylistTable(QTableWidget):
         self.setHorizontalHeaderLabels(["Название", "Исполнтель", "Длительность"])
         self.viewport().installEventFilter(self)
 
-        self.__contextMenu = QMenu(self)
-        self.__contextMenu.setObjectName('contextMenu')
-        self.__contextMenu.addAction('Воспроизвести')
-        self.__contextMenu.addAction('Добавить в очередь')
-        self.__contextMenu.addSeparator()
-        self.__contextMenu.addAction('Удалить')
-        self.__contextMenu.triggered.connect(self.menuPressed)
+        self._contextMenu = QMenu(self)
+        self._contextMenu.setObjectName('contextMenu')
+        self._contextMenu.addAction('Воспроизвести')
+        self._contextMenu.addAction('Добавить в очередь')
+        self._contextMenu.addSeparator()
+        self._contextMenu.addAction('Удалить')
+        self._contextMenu.triggered.connect(self.menuPressed)
 
         self.path = self.getPath()
         self.loadPlaylistThread = threading.Thread(target=lambda:[self.loadPlaylist(self.path)])
@@ -46,14 +46,14 @@ class PlaylistTable(QTableWidget):
             case 'Воспроизвести':
                 print("play")
             case 'Добавить в очередь':
-                self.myParent.queuePlaylist.addToQueue(self.itemAt(action.sender().pos() - self.myParent.pos() - self.pos() - QPoint(15,40)).row()+1)
+                self._parent.addToQueue(self.itemAt(action.sender().pos() - self._parent.pos() - self.pos() - QPoint(15,40)).row()+1)
             case 'Удалить':
                 print("remove")
 
     def loadPlaylist(self, path: str) -> None:
         while self.rowCount() > 0:
             self.removeRow(self.rowCount()-1)
-        self.myParent.nowPlaying = 1
+        self._parent.nowPlaying = 1
         count = 0
         dictOfMedia = {}
         for root, dirs, files in os.walk(path):
@@ -77,11 +77,11 @@ class PlaylistTable(QTableWidget):
             break
         self.playlist = dictOfMedia
         if self.playlist == {}:
-            self.myParent.buttonInterface.setDisabled(True)
-            self.myParent.btn_openMiniWindow.setDisabled(True)
+            self._parent.buttonInterface.setDisabled(True)
+            self._parent.btn_openMiniWindow.setDisabled(True)
         else:
-            self.myParent.buttonInterface.setDisabled(False)
-            self.myParent.btn_openMiniWindow.setDisabled(False)
+            self._parent.buttonInterface.setDisabled(False)
+            self._parent.btn_openMiniWindow.setDisabled(False)
         time.sleep(0.05)
         if self.verticalScrollBar().isVisible():
             self.setColumnWidth(0, ((self.width() * 40) // 100))
@@ -90,14 +90,14 @@ class PlaylistTable(QTableWidget):
         if (event.type() == QEvent.Type.MouseButtonPress and event.buttons() == Qt.MouseButton.RightButton):
             item = self.itemAt(event.pos())
             if item:
-                self.__contextMenu.move(self.myParent.pos().x() + self.pos().x() + event.pos().x() + 15, self.myParent.pos().y() + self.pos().y() + event.pos().y() + 40)
-                self.__contextMenu.show()
+                self._contextMenu.move(self._parent.pos().x() + self.pos().x() + event.pos().x() + 15, self._parent.pos().y() + self.pos().y() + event.pos().y() + 40)
+                self._contextMenu.show()
                 pass
         elif (event.type() == QEvent.Type.MouseButtonDblClick and event.buttons() == Qt.MouseButton.LeftButton):
             item = self.itemAt(event.pos())
             if item:
-                self.myParent.buttonInterface.changeMedia(self.itemAt(event.pos()).row()+1)
-                self.myParent.buttonInterface.play()
+                self._parent.buttonInterface.changeMedia(self.itemAt(event.pos()).row()+1)
+                self._parent.buttonInterface.play()
         return super(PlaylistTable, self).eventFilter(source, event)
 
     def getPath(self) -> str:
@@ -115,7 +115,7 @@ class PlaylistTable(QTableWidget):
         return path
 
     def changeDir(self) -> None:
-        self.myParent.buttonInterface.stop()
+        self._parent.buttonInterface.stop()
         newPath = QFileDialog.getExistingDirectory(directory=os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop'))
         dirHasMP3 = False
 
@@ -127,8 +127,8 @@ class PlaylistTable(QTableWidget):
             break
 
         if not (dirHasMP3):
-            self.myParent.warningWindow.show()
-            self.myParent.setDisabled(True)
+            self._parent.warningWindow.show()
+            self._parent.setDisabled(True)
         else:
             self.path = newPath
             loadListThread = threading.Thread(target=lambda:[self.loadPlaylist(self.path)])
