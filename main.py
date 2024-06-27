@@ -9,10 +9,10 @@ from modules.GlobalVariable import CSS
 from modules.SimpleModules import WindowTitleBar, Button
 from modules.ButtonInterface import ButtonInterface
 from modules.PlaylistTable import PlaylistTable
+from modules.QueuePlaylist import QueuePlaylist
 
 # from modules.MiniWindow import MiniWindow
 # from modules.WarningWindow import WarningWindow
-# from modules.QueuePlaylist import QueuePlaylist
 
 class MainWindow(QMainWindow):
     def __init__(self, title: str):
@@ -21,6 +21,7 @@ class MainWindow(QMainWindow):
         self._title: str = title
         self._mustCheckAudioOut: bool = True
         # self.playlist: list[str] = []
+        self.queue: list[int] = []
 
         # self.nowPlaying: int = 1
         # self.playbackState: bool = False
@@ -37,7 +38,8 @@ class MainWindow(QMainWindow):
 
         windowHat = WindowTitleBar(self, self._icon, self._title, "dark-comp")
         self._buttonInterface = ButtonInterface(self, 1, self.height()-111, self.width()-2, 110)
-        self._playlistTable = PlaylistTable(self, 1, windowHat.height(), self.width()-2, self.height()-(windowHat.height()+self._buttonInterface.height()))
+        self._playlistTable = PlaylistTable(self, 1, windowHat.height(), ((self.width()-2) * 80) // 100, self.height()-(windowHat.height()+self._buttonInterface.height()))
+        self._queueTable = QueuePlaylist(self, self._playlistTable.width()+1, windowHat.height(), ((self.width()-2) * 20) // 100, self.height()-(windowHat.height()+self._buttonInterface.height()))
 
         btn_close = Button(self, CLOSE_ICON, self.width()-30, 0, 30, 30, "btn_red_transp", self.closeEvent)
         btn_close.setToolTip("Закрыть окно")

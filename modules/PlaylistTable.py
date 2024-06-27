@@ -10,7 +10,6 @@ class PlaylistTable(QTableWidget):
                  x: int, y:int, width: int, height: int):
         super().__init__(0, 3, parent)
         self._parent = parent
-        # self.playlist: dict = {}
 
         self.setFixedSize(width, height)
         self.move(x, y)
