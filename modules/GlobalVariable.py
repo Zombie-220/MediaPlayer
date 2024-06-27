@@ -24,6 +24,8 @@ DOTS_ICON = QPixmap(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\do
 FULLSCREEN_ICON = QIcon(Rf'{os.path.abspath(os.path.dirname(sys.argv[0]))}\images\fullscreen.png')
 
 CSS = '''
+    #test { border: 2px solid rgb(255,0,0); }
+
     * {
         color: rgb(240,240,240);
         font-size: 14px;
@@ -97,6 +99,7 @@ CSS = '''
     QToolTip {
         font-size: 12px;
     }
+
     QSlider:groove {
         border: 1px solid rgb(21,21,21);
         border-radius: 5px;
@@ -105,5 +108,35 @@ CSS = '''
         background-color: rgb(255,88,0);
         border-radius: 3px;
         width: 6px;
+    }
+
+    QTableWidget {
+        background-color: rgba(0,0,0,0);
+        border: none;
+    }
+    QHeaderView {
+        background-color: rgba(0,0,0,0);
+    }
+    QHeaderView::section {
+        background-color: rgba(0,0,0,0);
+        border: 1px solid rgb(21,21,21);
+        font: bold;
+        padding-left: 5px;
+    }
+    QScrollBar:vertical {
+        background-color: rgba(0,0,0,0);
+        width: 7px;
+    }
+    QScrollBar::handle:vertical {
+        background-color: rgba(255,88,0,1);
+        border: 1px solid rgb(21,21,21);
+    }
+    QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+        background-color: rgb(21,21,21);
+    }
+    QTableView::item:selected {
+        background: rgba(21,21,21,0.5);
+        color: rgb(240,240,240);
+        border: none;
     }
 '''

@@ -8,8 +8,8 @@ from modules.GlobalVariable import APP_ICON, CLOSE_ICON, MINIMIZE_ICON, FOLDER_I
 from modules.GlobalVariable import CSS
 from modules.SimpleModules import WindowTitleBar, Button
 from modules.ButtonInterface import ButtonInterface
+from modules.PlaylistTable import PlaylistTable
 
-# from modules.PlaylistTable import PlaylistTable
 # from modules.MiniWindow import MiniWindow
 # from modules.WarningWindow import WarningWindow
 # from modules.QueuePlaylist import QueuePlaylist
@@ -17,24 +17,27 @@ from modules.ButtonInterface import ButtonInterface
 class MainWindow(QMainWindow):
     def __init__(self, title: str):
         super().__init__()
-        self.icon: QPixmap = APP_ICON
-        self.title: str = title
-        self.nowPlaying: int = 1
-        self.playbackState: bool = False
-        self.repeatTrack: bool = False
-        self.randomEnabled: bool = False
-        self.listOfTracks: list[int] = []
-        self.mustCheckAudioOut: bool = True
+        self._icon: QPixmap = APP_ICON
+        self._title: str = title
+        self._mustCheckAudioOut: bool = True
+        # self.playlist: list[str] = []
 
-        self.setWindowIcon(QIcon(self.icon))
-        self.setWindowTitle(self.title)
+        # self.nowPlaying: int = 1
+        # self.playbackState: bool = False
+        # self.repeatTrack: bool = False
+        # self.randomEnabled: bool = False
+        # self.listOfTracks: list[int] = []
+
+        self.setWindowIcon(QIcon(self._icon))
+        self.setWindowTitle(self._title)
         self.setStyleSheet(CSS)
         self.setObjectName("MainWindow")
         self.setFixedSize(960, 560)
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
 
-        windowHat = WindowTitleBar(self, self.icon, self.title, "dark-comp")
-        self._buttonInterface = ButtonInterface(self, 1, self.height()-301, self.width()-2, 300, "transp-widget")
+        windowHat = WindowTitleBar(self, self._icon, self._title, "dark-comp")
+        self._buttonInterface = ButtonInterface(self, 1, self.height()-111, self.width()-2, 110)
+        self._playlistTable = PlaylistTable(self, 1, windowHat.height(), self.width()-2, self.height()-(windowHat.height()+self._buttonInterface.height()))
 
         btn_close = Button(self, CLOSE_ICON, self.width()-30, 0, 30, 30, "btn_red_transp", self.closeEvent)
         btn_close.setToolTip("Закрыть окно")
@@ -56,22 +59,22 @@ class MainWindow(QMainWindow):
         # self._mediaPlayer.durationChanged.connect(lambda d: [self._buttonInterface.sliderDuration.setRange(0, d)])
         # self._mediaPlayer.positionChanged.connect(self._buttonInterface.changeTimecode)
         # self._mediaPlayer.mediaStatusChanged.connect(self._buttonInterface.mediaStatusChanged)
-        self.checkAudioOutThread = threading.Thread(target=self.checkAudioOut)
+        self.checkAudioOutThread = threading.Thread(target=self._checkAudioOut)
 
     def closeEvent(self, event) -> None:
-        self.mustCheckAudioOut = False
+        self._mustCheckAudioOut = False
         self.close()
 
-    def checkAudioOut(self) -> None:
-        while self.mustCheckAudioOut:
+    def _checkAudioOut(self) -> None:
+        while self._mustCheckAudioOut:
             if self._mediaPlayer.audioOutput() != None:
                 if self._mediaPlayer.audioOutput().device() != QAudioOutput().device():
                     self._audioOutput = QAudioOutput()
-                    self._audioOutput.setVolume(self._buttonInterface.sliderVolume.value() / 100)
+                    # self._audioOutput.setVolume(self._buttonInterface.sliderVolume.value() / 100)
                     self._mediaPlayer.setAudioOutput(self._audioOutput)
             else:
                 self._audioOutput = QAudioOutput()
-                self._audioOutput.setVolume(self._buttonInterface.sliderVolume.value() / 100)
+                # self._audioOutput.setVolume(self._buttonInterface.sliderVolume.value() / 100)
                 self._mediaPlayer.setAudioOutput(self._audioOutput)
             time.sleep(1)
 
