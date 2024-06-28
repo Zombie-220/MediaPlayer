@@ -139,4 +139,24 @@ CSS = '''
         color: rgb(240,240,240);
         border: none;
     }
+
+    QMenu {
+        background-color: rgb(40,40,40);
+        border: 1px solid rgb(21,21,21);
+        color: #fff;
+    }
+    QMenu::separator {
+        height: 2px;
+        margin-left: 5px;
+        margin-right: 5px;
+        margin-top: 4px;
+        margin-bottom: 4px;
+        background: rgb(21,21,21);
+    }
+    QMenu::item:selected {
+        background-color: rgba(21,21,21,0.8);
+    }
+    QMenu::item:pressed {
+        background-color: rgba(21,21,21,0.6);
+    }
 '''
