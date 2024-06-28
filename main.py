@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog
-from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtCore import Qt, QSize, QUrl
 from PyQt6.QtGui import QIcon, QPixmap
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 import sys, os, time
@@ -132,6 +132,19 @@ class MainWindow(QMainWindow):
             path = cursor.execute("SELECT path FROM pathToDir").fetchone()[0]
         connect.close()
         return path
+    
+    def changeMedia(self, musicID: int) -> None:
+        newMedia = QUrl.fromLocalFile(Rf"{self._playlist[musicID]}")
+        self._mediaPlayer.stop()
+        time.sleep(0.5)
+        self._mediaPlayer.setSource(newMedia)
+
+        self._playlistTable.changeMedia(self._nowPlaying, musicID)
+        self._buttonInterface.changeMedia(self._playlist[musicID])
+
+        self._nowPlaying = musicID
+
+    def play(self) -> None: self._mediaPlayer.play()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

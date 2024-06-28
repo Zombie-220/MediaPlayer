@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QTableWidget, QAbstractItemView, QTableWidgetItem, QWidget, QMenu, QHeaderView, QFileDialog
 from PyQt6.QtCore import Qt, QEvent, QPoint
-from PyQt6.QtGui import QAction
+from PyQt6.QtGui import QAction, QColor
 import os, eyed3, threading, time, sqlite3
 
 from MainWindowHeader import MainWindow
@@ -45,8 +45,8 @@ class PlaylistTable(QTableWidget):
         elif (event.type() == QEvent.Type.MouseButtonDblClick and event.buttons() == Qt.MouseButton.LeftButton):
             item = self.itemAt(event.pos())
             if item:
-                self.myParent.buttonInterface.changeMedia(self.itemAt(event.pos()).row()+1)
-                self.myParent.buttonInterface.play()
+                self._parent.changeMedia(self.itemAt(event.pos()).row())
+                self._parent.play()
         return super(PlaylistTable, self).eventFilter(source, event)
 
     def _menuPressed(self, action: QAction) -> None:
@@ -79,3 +79,10 @@ class PlaylistTable(QTableWidget):
         self.setItem(self.rowCount()-1, 2, QTableWidgetItem(duration))
         time.sleep(0.02)
         if self.verticalScrollBar().isVisible(): self.setColumnWidth(0, int((self.width() * 39.2) // 100))
+
+    def changeMedia(self, oldTraackInt: int, newTrackInt: int) -> None:
+        for i in range(self.columnCount()):
+            try: self.item(oldTraackInt, i).setBackground(QColor(0,0,0,0))
+            except: pass
+            try: self.item(newTrackInt, i).setBackground(QColor(255,88,0,240))
+            except: pass

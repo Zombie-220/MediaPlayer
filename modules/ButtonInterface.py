@@ -73,7 +73,16 @@ class ButtonInterface(Label):
         self._btnRepeat.setToolTip("Включить повтор")
         self._btnRepeat.setStyleSheet(CSS)
 
-        self._btnRepeat = Label(self, self._btnRandom.pos().x()+self._btnRandom.width()+10, self._btnRandom.pos().y(),
+        self._labelNames = Label(self, self._btnRandom.pos().x()+self._btnRandom.width()+10, self._btnRandom.pos().y(),
                                       (self._entryDuration.pos().x()+self._entryDuration.width())-(self._btnRandom.pos().x()+self._btnRandom.width()+10), 45,
                                       "label", "Исполнитель: >_<\nНазвание: >_<")
-        self._btnRepeat.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self._labelNames.setAlignment(Qt.AlignmentFlag.AlignLeft)
+
+    def changeMedia(self, linkToMP3: str) -> None:
+        mp3 = eyed3.load(linkToMP3)
+        if mp3.tag:
+            if mp3.tag.artist: artist = mp3.tag.artist
+            else: artist = ">-<"
+            if mp3.tag.title: title = mp3.tag.title
+            else: title = ">-<"
+        self._labelNames.setText(f"Исполнитель: {artist}\nНазвание: {title}")
