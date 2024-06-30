@@ -41,6 +41,11 @@ class MainWindow(QMainWindow):
         self.setFixedSize(960, 560)
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
 
+        self._mediaPlayer = QMediaPlayer(self)
+        self._audioOutput = QAudioOutput(self)
+        self._audioOutput.setVolume(0.2)
+        self._mediaPlayer.setAudioOutput(self._audioOutput)
+
         windowHat = WindowTitleBar(self, self._icon, self._title, "dark-comp")
         self._buttonInterface = ButtonInterface(self, 1, self.height()-111, self.width()-2, 110)
         self._playlistTable = PlaylistTable(self, 1, windowHat.height(), ((self.width()-2) * 80) // 100, self.height()-(windowHat.height()+self._buttonInterface.height()))
@@ -57,11 +62,6 @@ class MainWindow(QMainWindow):
         self._btn_openMiniWindow = Button(self, MINI_WINDOW_ICON, self.width()-90, 0, 30, 30, "btn_orange_transp")
         self._btn_openMiniWindow.setToolTip("Открыть мини проигрыватель")
         self._btn_openMiniWindow.setIconSize(QSize(20,20))
-
-        self._mediaPlayer = QMediaPlayer(self)
-        self._audioOutput = QAudioOutput(self)
-        self._audioOutput.setVolume(0.2)
-        self._mediaPlayer.setAudioOutput(self._audioOutput)
 
         # self._mediaPlayer.durationChanged.connect(lambda d: [self._buttonInterface.sliderDuration.setRange(0, d)])
         # self._mediaPlayer.positionChanged.connect(self._buttonInterface.changeTimecode)
@@ -100,7 +100,7 @@ class MainWindow(QMainWindow):
         else: self._buttonInterface.setDisabled(False)
 
     def _changeDir(self) -> None:
-        # self.myParent.buttonInterface.stop()
+        self.stop()
         newPath = QFileDialog.getExistingDirectory(directory=os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop'))
         dirHasMP3 = False
         for root, dirs, files in os.walk(newPath):
@@ -216,6 +216,8 @@ class MainWindow(QMainWindow):
         if muteState: self._mediaPlayer.audioOutput().setMuted(False)
         else: self._mediaPlayer.audioOutput().setMuted(True)
         self._buttonInterface.changeMuteButton(not (muteState))
+
+    def changeVolume(self, volume: float) -> None: self._mediaPlayer.audioOutput().setVolume(volume)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
