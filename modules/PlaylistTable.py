@@ -74,7 +74,7 @@ class PlaylistTable(QTableWidget):
         else:
             time.sleep(0.05)
             self.setSpan(self.rowCount()-1, 0, 1, 2)
-            self.setItem(self.rowCount()-1, 0, QTableWidgetItem(f'{file}'))
+            self.setItem(self.rowCount()-1, 0, QTableWidgetItem(f'{file[:file.rfind(".")]}'))
             duration = "--:--"
         self.setItem(self.rowCount()-1, 2, QTableWidgetItem(duration))
         time.sleep(0.02)

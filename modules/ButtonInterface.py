@@ -6,7 +6,8 @@ import random, eyed3, time
 
 from modules.SimpleModules import Label, Button, LineEntry
 from modules.GlobalVariable import (PLAY_ICON, PREVIOUS_ICON, NEXT_ICON, REDUCE_VOLUME_ICON, ADD_VOLUME_ICON,
-                                    MUTE_ICON, CSS, RANDOM_ICON, REPEAT_ICON, PAUSE_ICON)
+                                    MUTE_ICON, RANDOM_ICON, REPEAT_ICON, PAUSE_ICON)
+from modules.GlobalVariable import CSS
 
 from MainWindowHeader import MainWindow
 
@@ -15,17 +16,14 @@ class ButtonInterface(Label):
         super().__init__(parent, x, y, width, height, "", "")
         self._parent = parent
 
-        # self._btnPlay = Button(self, PLAY_ICON, 10, 10, 125, 50, "btn_orange", self.changePlaybackState)
-        self._btnPlay = Button(self, PLAY_ICON, 10, 10, 125, 50, "btn_orange")
+        self._btnPlay = Button(self, PLAY_ICON, 10, 10, 125, 50, "btn_orange", self._parent.changePlaybackState)
         self._btnPlay.setIconSize(QSize(30,30))
         self._btnPlay.setShortcut(Qt.Key.Key_Space)
         self._btnPlay.setToolTip("Проиграть")
-        # btn_previous = Button(self, PREVIOUS_ICON, 10, self._btnPlay.pos().y()+self._btnPlay.height()+10, 60, 30, "btn_orange", self.previousTrack)
-        btn_previous = Button(self, PREVIOUS_ICON, 10, self._btnPlay.pos().y()+self._btnPlay.height()+10, 60, 30, "btn_orange")
+        btn_previous = Button(self, PREVIOUS_ICON, 10, self._btnPlay.pos().y()+self._btnPlay.height()+10, 60, 30, "btn_orange", self._parent.previousTrack)
         btn_previous.setShortcut(Qt.Key.Key_Left)
         btn_previous.setToolTip("Предыдущий трэк")
-        # btn_next = Button(self, NEXT_ICON, btn_previous.pos().x()+btn_previous.width()+5, self._btnPlay.pos().y()+self._btnPlay.height()+10, 60, 30, "btn_orange", self.nextTrack)
-        btn_next = Button(self, NEXT_ICON, btn_previous.pos().x()+btn_previous.width()+5, self._btnPlay.pos().y()+self._btnPlay.height()+10, 60, 30, "btn_orange")
+        btn_next = Button(self, NEXT_ICON, btn_previous.pos().x()+btn_previous.width()+5, self._btnPlay.pos().y()+self._btnPlay.height()+10, 60, 30, "btn_orange", self._parent.nextTrack)
         btn_next.setShortcut(Qt.Key.Key_Right)
         btn_next.setToolTip("Следующий трэк")
 
@@ -40,8 +38,7 @@ class ButtonInterface(Label):
         btn_addVolume.setToolTip("Увеличить громкость")
         btn_addVolume.setShortcut(Qt.Key.Key_Up)
         btn_addVolume.setIconSize(QSize(20,20))
-        # self._btnMute = Button(self, MUTE_ICON, btn_addVolume.pos().x(), btn_addVolume.pos().y()+btn_addVolume.height()+5, 30, 30, "btn_orange", self.mute)
-        self._btnMute = Button(self, MUTE_ICON, btn_addVolume.pos().x(), btn_addVolume.pos().y()+btn_addVolume.height()+5, 30, 30, "btn_orange")
+        self._btnMute = Button(self, MUTE_ICON, btn_addVolume.pos().x(), btn_addVolume.pos().y()+btn_addVolume.height()+5, 30, 30, "btn_orange", self._parent.mute)
         self._btnMute.setToolTip("Выключить звук")
         self._btnMute.setShortcut(Qt.Key.Key_M)
         self._btnMute.setIconSize(QSize(20,20))
@@ -62,8 +59,7 @@ class ButtonInterface(Label):
 
         self._entryDuration = LineEntry(self, self._sliderDuration.pos().x()+self._sliderDuration.width()+10, btn_next.pos().y(), 90, 30, "0:00", True, "dark-comp-radius")
 
-        # self._btnRandom = Button(self, RANDOM_ICON, btn_addVolume.pos().x()+btn_addVolume.width()+10, btn_addVolume.pos().y(), 30, 30, "btn_orange", self.enableRandom)
-        self._btnRandom = Button(self, RANDOM_ICON, btn_addVolume.pos().x()+btn_addVolume.width()+10, btn_addVolume.pos().y(), 30, 30, "btn_orange")
+        self._btnRandom = Button(self, RANDOM_ICON, btn_addVolume.pos().x()+btn_addVolume.width()+10, btn_addVolume.pos().y(), 30, 30, "btn_orange", self._parent.changeRandom)
         self._btnRandom.setIconSize(QSize(20,20))
         self._btnRandom.setToolTip("Воспроизводить в случайном порядке")
         self._btnRandom.setStyleSheet(CSS)
@@ -75,14 +71,34 @@ class ButtonInterface(Label):
 
         self._labelNames = Label(self, self._btnRandom.pos().x()+self._btnRandom.width()+10, self._btnRandom.pos().y(),
                                       (self._entryDuration.pos().x()+self._entryDuration.width())-(self._btnRandom.pos().x()+self._btnRandom.width()+10), 45,
-                                      "label", "Исполнитель: >_<\nНазвание: >_<")
+                                      "label", "Исполнитель: >-<\nНазвание: >-<")
         self._labelNames.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
     def changeMedia(self, linkToMP3: str) -> None:
         mp3 = eyed3.load(linkToMP3)
+        title = ">-<"
+        artist =  ">-<"
         if mp3.tag:
             if mp3.tag.artist: artist = mp3.tag.artist
-            else: artist = ">-<"
             if mp3.tag.title: title = mp3.tag.title
-            else: title = ">-<"
+        else:
+            title = linkToMP3[linkToMP3.rfind("\\")+1:linkToMP3.rfind(".")]
         self._labelNames.setText(f"Исполнитель: {artist}\nНазвание: {title}")
+
+    def changePlayButton(self, playbackState: bool) -> None:
+        if playbackState: self._btnPlay.setIcon(PAUSE_ICON)
+        else: self._btnPlay.setIcon(PLAY_ICON)
+
+    def changeRandomButton(self, randomEnabled: bool) -> None:
+        if randomEnabled: self._btnRandom.setObjectName("btn_red")
+        else: self._btnRandom.setObjectName("btn_orange")
+        self.setStyleSheet(CSS)
+
+    def changeMuteButton(self, muteEnabled: bool) -> None:
+        if muteEnabled:
+            self._btnMute.setObjectName("btn_red")
+            self._btnMute.setToolTip("Включить звук")
+        else:
+            self._btnMute.setObjectName("btn_orange")
+            self._btnMute.setToolTip("Выключить звук")
+        self.setStyleSheet(CSS)

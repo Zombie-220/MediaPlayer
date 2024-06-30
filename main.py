@@ -5,6 +5,7 @@ from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 import sys, os, time
 import threading
 import sqlite3
+import random
 
 from modules.GlobalVariable import APP_ICON, CLOSE_ICON, MINIMIZE_ICON, FOLDER_ICON, MINI_WINDOW_ICON
 from modules.GlobalVariable import CSS
@@ -22,14 +23,16 @@ class MainWindow(QMainWindow):
         self._icon: QPixmap = APP_ICON
         self._title: str = title
         self._mustCheckAudioOut: bool = True
-        self._nowPlaying: int = 1
+        self._nowPlaying: int = 0
         self._playlist: list[str] = []
+        self._playbackState: bool = False
+        self._randomEnabled: bool = False
+        self._alreadyUsedTracks: list[int] = []
+
         # self.queue: list[int] = []
 
-        # self.playbackState: bool = False
         # self.repeatTrack: bool = False
         # self.randomEnabled: bool = False
-        # self.listOfTracks: list[int] = []
 
         self.setWindowIcon(QIcon(self._icon))
         self.setWindowTitle(self._title)
@@ -57,6 +60,7 @@ class MainWindow(QMainWindow):
 
         self._mediaPlayer = QMediaPlayer(self)
         self._audioOutput = QAudioOutput(self)
+        self._audioOutput.setVolume(0.2)
         self._mediaPlayer.setAudioOutput(self._audioOutput)
 
         # self._mediaPlayer.durationChanged.connect(lambda d: [self._buttonInterface.sliderDuration.setRange(0, d)])
@@ -85,7 +89,7 @@ class MainWindow(QMainWindow):
 
     def _loadPlaylist(self, path: str) -> None:
         self._playlistTable.clearTable()
-        self._nowPlaying = 1
+        self._nowPlaying = 0
         for root, dirs, files in os.walk(path):
             for file in files:
                 if file.endswith('.mp3'):
@@ -144,7 +148,74 @@ class MainWindow(QMainWindow):
 
         self._nowPlaying = musicID
 
-    def play(self) -> None: self._mediaPlayer.play()
+    def play(self) -> None:
+        self._mediaPlayer.play()
+        self._playbackState = True
+        self._buttonInterface.changePlayButton(self._playbackState)
+
+    def stop(self) -> None:
+        self._mediaPlayer.stop()
+        self._playbackState = False
+        self._buttonInterface.changePlayButton(self._playbackState)
+
+    def pause(self) -> None:
+        self._mediaPlayer.pause()
+        self._playbackState = False
+        self._buttonInterface.changePlayButton(self._playbackState)
+
+    def changePlaybackState(self) -> None:
+        match self._mediaPlayer.playbackState():
+            case QMediaPlayer.PlaybackState.StoppedState:
+                if self._randomEnabled:
+                    if len(self._playlist) == len(self._alreadyUsedTracks): self._alreadyUsedTracks = []
+                    nextTrack = random.randint(0, len(self._playlist))
+                    while nextTrack in self._alreadyUsedTracks: nextTrack = random.randint(0, len(self._playlist))
+                else: nextTrack = self._nowPlaying
+                self.changeMedia(nextTrack)
+                self.play()
+            case QMediaPlayer.PlaybackState.PlayingState: self.pause()
+            case QMediaPlayer.PlaybackState.PausedState: self.play()
+
+    def changeRandom(self) -> None:
+        self._randomEnabled = not self._randomEnabled
+        self._buttonInterface.changeRandomButton(self._randomEnabled)
+
+    def previousTrack(self) -> None:
+        if self._mediaPlayer.position() > 5000: self._mediaPlayer.setPosition(0)
+        else:
+            if self._randomEnabled:
+                if len(self._alreadyUsedTracks) >= 1: self._alreadyUsedTracks.pop()
+                if len(self._alreadyUsedTracks) <= 0:
+                    nextTrack = random.randint(0, (len(self._playlist) - 1))
+                    while nextTrack == self._nowPlaying: nextTrack = random.randint(0, (len(self._playlist) - 1))
+                else: nextTrack = self._alreadyUsedTracks[-1]
+            else:
+                if self._nowPlaying <= 0: nextTrack = (len(self._playlist) - 1)
+                else: nextTrack = self._nowPlaying - 1
+            self.changeMedia(nextTrack)
+        if self._playbackState: self.play()
+
+    def nextTrack(self) -> None:
+        # if self.myParent.queuePlaylist.queue != []:
+        #     nextTrack = self.myParent.queuePlaylist.queue[0]
+        #     self.myParent.queuePlaylist.removeFromQueue(0)
+        # else:
+        if self._randomEnabled:
+            if len(self._alreadyUsedTracks) == len(self._playlist): self._alreadyUsedTracks = []
+            nextTrack = random.randint(0, (len(self._playlist) - 1))
+            while nextTrack in self._alreadyUsedTracks: nextTrack = random.randint(0, (len(self._playlist) - 1))
+            self._alreadyUsedTracks.append(nextTrack)
+        else:
+            if self._nowPlaying >= (len(self._playlist) - 1): nextTrack = 0
+            else: nextTrack = self._nowPlaying + 1
+        self.changeMedia(nextTrack)
+        if self._playbackState: self.play()
+
+    def mute(self) -> None:
+        muteState = self._mediaPlayer.audioOutput().isMuted()
+        if muteState: self._mediaPlayer.audioOutput().setMuted(False)
+        else: self._mediaPlayer.audioOutput().setMuted(True)
+        self._buttonInterface.changeMuteButton(not (muteState))
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
