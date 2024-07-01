@@ -1,11 +1,9 @@
 from PyQt6.QtWidgets import QSlider
-from PyQt6.QtCore import Qt, QSize, QUrl
-from PyQt6.QtGui import QColor
-from PyQt6.QtMultimedia import QMediaPlayer
-import random, eyed3, time
+from PyQt6.QtCore import Qt, QSize
+import eyed3
 
 from modules.SimpleModules import Label, Button, LineEntry
-from modules.GlobalVariable import (PLAY_ICON, PREVIOUS_ICON, NEXT_ICON, REDUCE_VOLUME_ICON, ADD_VOLUME_ICON, MUTE_ICON, RANDOM_ICON, REPEAT_ICON, PAUSE_ICON)
+from modules.GlobalVariable import PLAY_ICON, PREVIOUS_ICON, NEXT_ICON, REDUCE_VOLUME_ICON, ADD_VOLUME_ICON, MUTE_ICON, RANDOM_ICON, REPEAT_ICON, PAUSE_ICON
 from modules.GlobalVariable import CSS
 
 from MainWindowHeader import MainWindow
@@ -50,9 +48,9 @@ class ButtonInterface(Label):
         self.__sliderDuration = QSlider(Qt.Orientation.Horizontal, self)
         self.__sliderDuration.move(btn_next.pos().x() + btn_next.width() + 10, btn_next.pos().y() + 10)
         self.__sliderDuration.setFixedSize(self.width() - (btn_next.pos().x() + btn_next.width() + 10) - 110, 15)
-        # self.__sliderDuration.sliderPressed.connect(self.__parent.mediaPlayer.stop)
-        # self.__sliderDuration.sliderReleased.connect(self.sliderReleased)
-        # self.__sliderDuration.valueChanged.connect(self.changeTimecode)
+        self.__sliderDuration.sliderPressed.connect(self.__parent.stopMedia)
+        self.__sliderDuration.sliderReleased.connect(lambda: [self.__parent.setMediaPosition(self.__sliderDuration.value())])
+        self.__sliderDuration.valueChanged.connect(lambda d: [self.__entryDuration.setText(f"{(d//1000//60):>1}:{(d//1000%60):0>2}")])
 
         self.__entryDuration = LineEntry(self, self.__sliderDuration.pos().x()+self.__sliderDuration.width()+10, btn_next.pos().y(), 90, 30, "0:00", True, "dark-comp-radius")
 
@@ -60,8 +58,7 @@ class ButtonInterface(Label):
         self.__btnRandom.setIconSize(QSize(20,20))
         self.__btnRandom.setToolTip("Воспроизводить в случайном порядке")
         self.__btnRandom.setStyleSheet(CSS)
-        # self.__btnRepeat = Button(self, REPEAT_ICON, self.__btnRandom.pos().x(), self.__btnMute.pos().y(), 30, 30, "btn_orange", self.enableRepeat)
-        self.__btnRepeat = Button(self, REPEAT_ICON, self.__btnRandom.pos().x(), self.__btnMute.pos().y(), 30, 30, "btn_orange")
+        self.__btnRepeat = Button(self, REPEAT_ICON, self.__btnRandom.pos().x(), self.__btnMute.pos().y(), 30, 30, "btn_orange", self.__parent.changeRepeat)
         self.__btnRepeat.setIconSize(QSize(20,20))
         self.__btnRepeat.setToolTip("Включить повтор")
         self.__btnRepeat.setStyleSheet(CSS)
@@ -100,6 +97,17 @@ class ButtonInterface(Label):
             self.__btnMute.setToolTip("Выключить звук")
         self.setStyleSheet(CSS)
 
+    def changeRepeatButton(self, enableRepeat: bool) -> None:
+        if enableRepeat: self.__btnRepeat.setObjectName("btn_red")
+        else: self.__btnRepeat.setObjectName("btn_orange")
+        self.setStyleSheet(CSS)
+
     def __volumeChanged(self, volume: int) -> None:
         self.__entryVolume.setText(f"{volume}")
         self.__parent.changeVolume(volume / 100)
+
+    def changeDuration(self, d: int) -> None: self.__sliderDuration.setRange(0, d)
+    def setDuration(self, d: int) -> None: self.__sliderDuration.setValue(d)
+
+    def getValue(self) -> int:
+        return self.__sliderVolume.value()

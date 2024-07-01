@@ -28,6 +28,7 @@ class MainWindow(QMainWindow):
         self._playbackState: bool = False
         self._randomEnabled: bool = False
         self._alreadyUsedTracks: list[int] = []
+        self.__repeatEnabled: bool = False
 
         # self.queue: list[int] = []
 
@@ -45,6 +46,9 @@ class MainWindow(QMainWindow):
         self._audioOutput = QAudioOutput(self)
         self._audioOutput.setVolume(0.2)
         self._mediaPlayer.setAudioOutput(self._audioOutput)
+        self._mediaPlayer.durationChanged.connect(lambda d: [self._buttonInterface.changeDuration(d)])
+        self._mediaPlayer.positionChanged.connect(lambda d: [self._buttonInterface.setDuration(d)])
+        self._mediaPlayer.mediaStatusChanged.connect(self.__mediaStatusChanged)
 
         windowHat = WindowTitleBar(self, self._icon, self._title, "dark-comp")
         self._buttonInterface = ButtonInterface(self, 1, self.height()-111, self.width()-2, 110)
@@ -63,9 +67,6 @@ class MainWindow(QMainWindow):
         self._btn_openMiniWindow.setToolTip("Открыть мини проигрыватель")
         self._btn_openMiniWindow.setIconSize(QSize(20,20))
 
-        # self._mediaPlayer.durationChanged.connect(lambda d: [self._buttonInterface.sliderDuration.setRange(0, d)])
-        # self._mediaPlayer.positionChanged.connect(self._buttonInterface.changeTimecode)
-        # self._mediaPlayer.mediaStatusChanged.connect(self._buttonInterface.mediaStatusChanged)
         self.checkAudioOutThread = threading.Thread(target=self._checkAudioOut)
         self._path = self._getPath()
         self.loadPlaylistThread = threading.Thread(target=lambda: [self._loadPlaylist(self._path)])
@@ -79,11 +80,11 @@ class MainWindow(QMainWindow):
             if self._mediaPlayer.audioOutput() != None:
                 if self._mediaPlayer.audioOutput().device() != QAudioOutput().device():
                     self._audioOutput = QAudioOutput()
-                    # self._audioOutput.setVolume(self._buttonInterface.sliderVolume.value() / 100)
+                    self._audioOutput.setVolume(self._buttonInterface.getValue() / 100)
                     self._mediaPlayer.setAudioOutput(self._audioOutput)
             else:
                 self._audioOutput = QAudioOutput()
-                # self._audioOutput.setVolume(self._buttonInterface.sliderVolume.value() / 100)
+                self._audioOutput.setVolume(self._buttonInterface.getValue() / 100)
                 self._mediaPlayer.setAudioOutput(self._audioOutput)
             time.sleep(1)
 
@@ -180,6 +181,10 @@ class MainWindow(QMainWindow):
         self._randomEnabled = not self._randomEnabled
         self._buttonInterface.changeRandomButton(self._randomEnabled)
 
+    def changeRepeat(self) -> None:
+        self.__repeatEnabled = not self.__repeatEnabled
+        self._buttonInterface.changeRepeatButton(self.__repeatEnabled)
+
     def previousTrack(self) -> None:
         if self._mediaPlayer.position() > 5000: self._mediaPlayer.setPosition(0)
         else:
@@ -218,6 +223,19 @@ class MainWindow(QMainWindow):
         self._buttonInterface.changeMuteButton(not (muteState))
 
     def changeVolume(self, volume: float) -> None: self._mediaPlayer.audioOutput().setVolume(volume)
+    def stopMedia(self) -> None: self._mediaPlayer.stop()
+
+    def setMediaPosition(self, value: int) -> None:
+        self._mediaPlayer.setPosition(value)
+        if self._playbackState: self.play()
+
+    def __mediaStatusChanged(self, status: QMediaPlayer.MediaStatus) -> None:
+        if status == QMediaPlayer.MediaStatus.EndOfMedia:
+            if self.__repeatEnabled:
+                self._mediaPlayer.setSource(QUrl())
+                self.changeMedia(self._nowPlaying)
+                self.play()
+            else: self.nextTrack()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
