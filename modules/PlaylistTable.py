@@ -1,7 +1,7 @@
-from PyQt6.QtWidgets import QTableWidget, QAbstractItemView, QTableWidgetItem, QWidget, QMenu, QHeaderView, QFileDialog
-from PyQt6.QtCore import Qt, QEvent, QPoint
+from PyQt6.QtWidgets import QTableWidget, QAbstractItemView, QTableWidgetItem, QWidget, QMenu, QHeaderView
+from PyQt6.QtCore import Qt, QEvent
 from PyQt6.QtGui import QAction, QColor
-import os, eyed3, threading, time, sqlite3
+import eyed3, time
 
 from MainWindowHeader import MainWindow
 
@@ -9,7 +9,7 @@ class PlaylistTable(QTableWidget):
     def __init__(self, parent: MainWindow,
                  x: int, y:int, width: int, height: int):
         super().__init__(0, 3, parent)
-        self._parent = parent
+        self.__parent = parent
 
         self.setFixedSize(width, height)
         self.move(x, y)
@@ -28,28 +28,28 @@ class PlaylistTable(QTableWidget):
         self.setHorizontalHeaderLabels(["Название", "Исполнтель", "Длительность"])
         self.viewport().installEventFilter(self)
 
-        self._contextMenu = QMenu(self)
-        self._contextMenu.setObjectName('contextMenu')
-        self._contextMenu.addAction('Воспроизвести')
-        self._contextMenu.addAction('Добавить в очередь')
-        self._contextMenu.addSeparator()
-        self._contextMenu.addAction('Удалить')
-        self._contextMenu.triggered.connect(self._menuPressed)
+        self.__contextMenu = QMenu(self)
+        self.__contextMenu.setObjectName('contextMenu')
+        self.__contextMenu.addAction('Воспроизвести')
+        self.__contextMenu.addAction('Добавить в очередь')
+        self.__contextMenu.addSeparator()
+        self.__contextMenu.addAction('Удалить')
+        self.__contextMenu.triggered.connect(self.__menuPressed)
 
     def eventFilter(self, source: QWidget, event: QEvent):
         if (event.type() == QEvent.Type.MouseButtonPress and event.buttons() == Qt.MouseButton.RightButton):
             item = self.itemAt(event.pos())
             if item:
-                self._contextMenu.move(self._parent.pos().x() + self.pos().x() + event.pos().x() + 15, self._parent.pos().y() + self.pos().y() + event.pos().y() + 40)
-                self._contextMenu.show()
+                self.__contextMenu.move(self.__parent.pos().x() + self.pos().x() + event.pos().x() + 15, self.__parent.pos().y() + self.pos().y() + event.pos().y() + 40)
+                self.__contextMenu.show()
         elif (event.type() == QEvent.Type.MouseButtonDblClick and event.buttons() == Qt.MouseButton.LeftButton):
             item = self.itemAt(event.pos())
             if item:
-                self._parent.changeMedia(self.itemAt(event.pos()).row())
-                self._parent.play()
+                self.__parent.changeMedia(self.itemAt(event.pos()).row())
+                self.__parent.play()
         return super(PlaylistTable, self).eventFilter(source, event)
 
-    def _menuPressed(self, action: QAction) -> None:
+    def __menuPressed(self, action: QAction) -> None:
         match action.text():
             case 'Воспроизвести':
                 print("play")

@@ -108,6 +108,4 @@ class ButtonInterface(Label):
 
     def changeDuration(self, d: int) -> None: self.__sliderDuration.setRange(0, d)
     def setDuration(self, d: int) -> None: self.__sliderDuration.setValue(d)
-
-    def getValue(self) -> int:
-        return self.__sliderVolume.value()
+    def getValue(self) -> int: return self.__sliderVolume.value()
